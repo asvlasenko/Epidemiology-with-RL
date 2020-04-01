@@ -1,7 +1,5 @@
 #include "approx_binomial.h"
 
-#include <math.h>
-
 // Draw a number of events from a Poisson distribution
 int poisson_draw(uint64 *k, float rate);
 
@@ -137,7 +135,7 @@ int approx_bin_draw(uint64 *k, float p, uint64 n) {
       }
     }
   }
-  
+
   *k = swap ? n - result : result;
   return 0;
 }

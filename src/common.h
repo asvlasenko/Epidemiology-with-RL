@@ -13,6 +13,9 @@ typedef uint32_t uint32;
 typedef int64_t int64;
 typedef uint64_t uint64;
 
-
+#include <math.h>
+#ifndef M_PI
+#define M_PI 3.1415926536
+#endif
 
 #endif

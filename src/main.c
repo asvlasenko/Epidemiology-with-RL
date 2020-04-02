@@ -10,24 +10,25 @@
 int main(int argc, char **argv) {
 
   printf("Testing model constructor\n");
-
   epi_error err;
   epi_model model;
   epi_scenario scenario = {0, 10, 550, -1};
-
   err = epi_construct_model(&model, &scenario,
     "./dat/disease.dat", "./dat/population.dat");
   assert(err == EPI_ERROR_SUCCESS);
   printf("  success!\n");
 
-  printf("Testing model destructor\n");
+  printf("Testing model step\n");
+  epi_input input = {0};
+  err = epi_model_step(model, &input);
+  assert(err == EPI_ERROR_SUCCESS);
+  printf("  success!\n");
 
+  printf("Testing model destructor\n");
   err = epi_free_model(&model);
   assert(err == EPI_ERROR_SUCCESS);
   assert(model == (epi_model)NULL);
   printf("  success!\n");
-
-  printf("Testing model step\n");
 
 /*  printf("Initializing model\n");
   disease_t *disease;

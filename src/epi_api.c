@@ -8,6 +8,8 @@ typedef struct epi_model_s {
   // Single population, for now.
   // TODO: implement hierarchical model for multiple populations and transport.
   size_t day;
+  bool started;
+  bool finished;
 
   epi_scenario scenario;
   disease_t *disease;
@@ -88,7 +90,7 @@ epi_error epi_free_model(epi_model *model) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error model_step(epi_model model, const epi_input *input) {
+epi_error epi_model_step(epi_model model, const epi_input *input) {
 
   epi_model_t *mptr = (epi_model_t *)model;
 
@@ -96,7 +98,34 @@ epi_error model_step(epi_model model, const epi_input *input) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  /* ... TODO ... */
+  // If model has finished, do nothing
+  if (mptr->finished) {
+    mptr->day++;
+    return EPI_ERROR_SUCCESS;
+  }
+
+  // Apply input as current policy
+  memcpy(&mptr->population->policy, input, sizeof(epi_input));
+
+  // Check for initial infection date
+  // TODO: vaccination
+  if (mptr->day == mptr->scenario.t_initial) {
+    PASS_ERROR(infect_pop(mptr->population, mptr->scenario.n_initial));
+    mptr->started = true;
+  }
+
+  // Check if max simulation time has passed or if disease has been eradicated
+  if ((mptr->started && mptr->population->n_infected == 0) ||
+    mptr->day >= mptr->scenario.t_max) {
+
+    mptr->day++;
+    mptr->finished = true;
+    return EPI_ERROR_SUCCESS;
+  }
+
+  // Step population forward one day
+  PASS_ERROR(evolve_pop(mptr->population, mptr->disease));
+  mptr->day++;
 
   return EPI_ERROR_SUCCESS;
 }

@@ -94,6 +94,10 @@ typedef struct epi_observable_s {
   // TODO: estimated number of people who called in sick to work, subject
   // to background noise
   // uint64 n_sick;
+
+  // Is the simulation finished?
+  bool finished;
+
 } epi_observable;
 
 // True model output for each step - this is not visible to the "player", but

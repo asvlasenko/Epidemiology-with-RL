@@ -42,6 +42,7 @@ epi_error_e create_pop_from_file(pop_t **out, const char *fname,
     return EPI_ERROR_OUT_OF_MEMORY;
   }
 
+  pop->max_duration = disease_duration;
   pop->n_total_active = ptr;
   pop->n_asymptomatic = &ptr[disease_duration];
   pop->n_symptomatic = &ptr[2*disease_duration];
@@ -161,7 +162,8 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis) {
       uint64 w_s = 0;   // Symptomatic becomes critical
       uint64 w_c = 0;   // Critical dies
 
-      // Estimate # of transitions by drawing from a double binomial distribution
+      // Estimate # of transitions by drawing from a double binomial
+      // distribution
       PASS_ERROR(approx_dbin_draw(&r_a, &w_a, p_r, p_s, n_a));
       PASS_ERROR(approx_dbin_draw(&r_s, &w_s, p_r, p_c, n_s));
       PASS_ERROR(approx_dbin_draw(&r_c, &w_c, p_r, p_d, n_c));

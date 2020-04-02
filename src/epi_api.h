@@ -22,10 +22,11 @@ typedef enum {
 #define PASS_ERROR(expr) \
   {epi_error_e _E_R_R_ = expr; if(_E_R_R_ != EPI_ERROR_SUCCESS) return _E_R_R_;}
 
-struct epi_model_s;
+// Model handle
+typedef size_t epi_model;
 
 // Scenario description
-typedef struct scenario_s {
+typedef struct epi_scenario_s {
   // Day of initial infection, -1 = never
   int t_initial;
   // Number of infected in first round
@@ -34,15 +35,16 @@ typedef struct scenario_s {
   int t_vaccine;
   // How long to run the scenario, -1 = to eradication
   int t_max;
-} scenario_t;
+} epi_scenario_t;
 
 // Create a single-population model from scenario description and 2 data files.
 // First file describes the disease, second one describes the population.
-epi_error_e epi_construct_model(struct epi_model_s **out,
-  const scenario_t *scenario, const char *dis_fname, const char *pop_fname);
+epi_error_e epi_construct_model(epi_model *out,
+  const epi_scenario_t *scenario, const
+  char *dis_fname, const char *pop_fname);
 
 // Free resources associated with a model.  Sets model pointer to NULL.
-epi_error_e epi_free_model(struct epi_model_s **model);
+epi_error_e epi_free_model(epi_model *out);
 
 struct epi_observable_output_s;
 // Observable model output for each step - this is visible to the "player"
@@ -74,7 +76,7 @@ typedef struct input_s {
 // hidden_out is additional information that can be logged for later
 // examination.
 // input is player's choices for response strategies from previous day.
-epi_error_e model_step(struct epi_model_s *model,
+epi_error_e model_step(epi_model *model,
   struct epi_observable_output_s *obs_out,
   struct epi_hidden_output_s *hidden_out,
   const struct epi_input_s *input);

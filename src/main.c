@@ -1,15 +1,23 @@
-#include "epi_api.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "disease.h"
-#include "population.h"
+#include "epi_api.h"
 
 #define INITIAL_INFECTIONS 10
 #define INITIAL_POPULATION 300000000
 
 int main(int argc, char **argv) {
-  epi_error_e err;
 
-  printf("Initializing model\n");
+  printf("Testing model constructor\n");
+
+  //epi_error_e err;
+  //struct epi_model_s model;
+
+
+  //err = epi_construct_model(&model,
+  //  const scenario_t *scenario, const char *dis_fname, const char *pop_fname)
+
+/*  printf("Initializing model\n");
   disease_t *disease;
   err = create_disease_from_file(&disease, "./dat/disease.dat");
   assert(err == EPI_ERROR_SUCCESS);
@@ -85,5 +93,5 @@ int main(int argc, char **argv) {
 
   err = free_disease(&disease);
   assert(!err);
-  assert(disease == NULL);
+  assert(disease == NULL);*/
 }

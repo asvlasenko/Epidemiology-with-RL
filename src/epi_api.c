@@ -8,13 +8,14 @@ typedef struct epi_model_s {
   // Single population, for now.
   // TODO: implement hierarchical model for multiple populations and transport.
   size_t day;
-  scenario_t scenario;
+  epi_scenario_t scenario;
   disease_t *disease;
   pop_t *population;
 } epi_model_t;
 
-epi_error_e epi_construct_model(struct epi_model_s **out,
-  const scenario_t *scenario, const char *dis_fname, const char *pop_fname) {
+epi_error_e epi_construct_model(epi_model *out,
+  const epi_scenario_t *scenario, const char *dis_fname,
+  const char *pop_fname) {
 
   if (out == NULL || scenario == NULL ||
     dis_fname == NULL || pop_fname == NULL) {
@@ -22,12 +23,12 @@ epi_error_e epi_construct_model(struct epi_model_s **out,
   }
 
   epi_model_t *model = calloc(1, sizeof(epi_model_t));
-  if (out == NULL) {
+  if (model == NULL) {
     return EPI_ERROR_OUT_OF_MEMORY;
   }
 
   // Set up scenario
-  memcpy(&(model->scenario), scenario, sizeof(scenario_t));
+  memcpy(&(model->scenario), scenario, sizeof(epi_scenario_t));
   // Outbreak never happens: indicated by t_initial == -1
   if (model->scenario.t_initial < 0 || model->scenario.n_initial == 0) {
     model->scenario.t_initial = -1;
@@ -62,23 +63,25 @@ epi_error_e epi_construct_model(struct epi_model_s **out,
     return err;
   }
 
-  *out = model;
+  *out = (epi_model)model;
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e epi_free_model(struct epi_model_s **model) {
+epi_error_e epi_free_model(epi_model *model) {
   if (model == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  if (*model == NULL) {
+  epi_model_t *ptr = (epi_model_t *)(*model);
+
+  if (ptr == NULL) {
     return EPI_ERROR_SUCCESS;
   }
 
-  free_disease(&((*model)->disease));
-  free_pop(&((*model)->population));
-  free(*model);
-  *model = NULL;
+  free_disease(&(ptr->disease));
+  free_pop(&(ptr->population));
+  free(ptr);
+  *model = (epi_model)NULL;
 
   return EPI_ERROR_SUCCESS;
 }

@@ -19,7 +19,7 @@ typedef enum {
 } epi_error_e;
 
 #define PASS_ERROR(expr) \
-  {epi_error_e err = expr; if(err != EPI_ERROR_SUCCESS) return err;}
+  {epi_error_e _E_R_R_ = expr; if(_E_R_R_ != EPI_ERROR_SUCCESS) return _E_R_R_;}
 
 struct epi_model_s;
 

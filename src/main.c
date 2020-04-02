@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   printf("Creating test population\n");
   pop_t *test_pop;
   err = create_pop(&test_pop, INITIAL_POPULATION, disease->max_duration);
-  assert(err = ERROR_SUCCESS);
+  assert(err == ERROR_SUCCESS);
   printf("  success!\n");
 
   // TODO: temporary hospital bed setup to model United States

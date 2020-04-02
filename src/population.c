@@ -1,4 +1,5 @@
 #include "approx_binomial.h"
+#include "files.h"
 #include "population.h"
 
 // Calculate average infection rate
@@ -7,7 +8,58 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis);
 // Calculate fraction of critical cases that can be hospitalized
 static float calc_hosp_rate(const pop_t *pop);
 
+// Read population parameters
+static epi_error_e read_pop_params(pop_t *pop, FILE *fp);
+
 epi_error_e create_pop_from_file(pop_t **out, const char *fname) {
+  if (out == NULL || fname == NULL) {
+    return EPI_ERROR_INVALID_ARGS;
+  }
+
+  FILE *fp = fopen(fname, "r");
+  if (fp == NULL) {
+    return EPI_ERROR_FILE_NOT_FOUND;
+  }
+
+  pop_t *pop = (pop_t *)calloc(1, sizeof(pop_t));
+  if (pop == NULL) {
+    fclose(fp);
+    return EPI_ERROR_OUT_OF_MEMORY;
+  }
+
+  epi_error_e err = read_pop_params(pop, fp);
+  if (err != EPI_ERROR_SUCCESS) {
+    fclose(fp);
+    free(pop);
+    return err;
+  }
+
+  *out = pop;
+  return EPI_ERROR_SUCCESS;
+}
+
+static epi_error_e read_pop_params(pop_t *pop, FILE *fp) {
+  PASS_ERROR(read_size_token(&(pop->n_total), fp, "N_TOTAL"));
+
+  // Susceptible population token is optional.
+  // If not found, set n_susceptible = n_total.
+  epi_error_e err = read_size_token(&(pop->n_susceptible), fp, "N_SUSCEPTIBLE");
+  if (err == EPI_ERROR_MISSING_DATA) {
+    pop->n_susceptible = pop->n_total;
+  } else if (err != EPI_ERROR_SUCCESS) {
+    return err;
+  }
+
+  PASS_ERROR(read_float_token(&(pop->cr_normal), fp, "CR_NORMAL"));
+  PASS_ERROR(read_float_token(&(pop->cr_home), fp, "CR_HOME"));
+  PASS_ERROR(read_float_token(&(pop->cr_hospital), fp, "CR_HOSPITAL"));
+
+  PASS_ERROR(read_float_token(&(pop->daily_production),fp,"DAILY_PRODUCTION"));
+  PASS_ERROR(read_float_token(&(pop->f_critical_jobs), fp, "F_CRITICAL_JOBS"));
+  PASS_ERROR(read_float_token(&(pop->prod_symp), fp, "PROD_SYMP"));
+  PASS_ERROR(read_float_token(&(pop->prod_dist), fp, "PROD_DIST"));
+  PASS_ERROR(read_float_token(&(pop->prod_home), fp, "PROD_HOME"));
+
   return EPI_ERROR_SUCCESS;
 }
 

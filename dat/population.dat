@@ -1,10 +1,13 @@
 *** BASIC DEMOGRAPHICS ***
 
 Total number of people in this population
-$N_TOTAL 300000000
+$N_TOTAL
+300000000
 
 Number of people susceptible to the disease
-$N_SUSCEPTIBLE 300000000
+Optional, if not given default to n_susceptible = n_total
+$N_SUSCEPTIBLE
+300000000
 
 *** TRANSMISSION MODEL ***
 
@@ -26,7 +29,7 @@ $CR_HOSPITAL
 Average baseline daily production
 For example, GDP per capita divided by days per year
 $DAILY_PRODUCTION
-160
+160.00
 
 Proportion of jobs that require employees on site even with stay-at-home orders
 $F_CRITICAL_JOBS

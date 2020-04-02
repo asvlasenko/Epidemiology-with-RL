@@ -12,12 +12,13 @@ epi_error_e read_size_token(size_t *s, FILE *fp, const char *token_name) {
     return EPI_ERROR_UNEXPECTED_EOF;
   }
 
-  int result = atoi(buf);
-  if (result <= 0) {
+  char *c;
+  unsigned long long result = strtoull(buf, &c, 10);
+  if (c == buf) {
     return EPI_ERROR_INVALID_DATA;
   }
 
-  *s = result;
+  *s = (size_t)result;
   return EPI_ERROR_SUCCESS;
 }
 

@@ -6,7 +6,7 @@ static epi_error_e allocate_disease_arrays(disease_t *dis);
 static epi_error_e read_disease_arrays(disease_t *dis, FILE *fp);
 
 epi_error_e create_disease_from_file(disease_t **out, const char *filename) {
-  if (out == NULL) {
+  if (out == NULL || filename == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
@@ -21,13 +21,14 @@ epi_error_e create_disease_from_file(disease_t **out, const char *filename) {
     return EPI_ERROR_OUT_OF_MEMORY;
   }
 
-  if (read_disease_params(dis, fp)) {
+  epi_error_e err = read_disease_params(dis, fp);
+  if (err != EPI_ERROR_SUCCESS) {
     fclose(fp);
     free(dis);
-    return EPI_ERROR_MISSING_DATA;
+    return err;
   }
 
-  epi_error_e err = allocate_disease_arrays(dis);
+  err = allocate_disease_arrays(dis);
   if (err != EPI_ERROR_SUCCESS) {
     fclose(fp);
     free(dis);

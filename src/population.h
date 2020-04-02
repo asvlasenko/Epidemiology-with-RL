@@ -12,7 +12,6 @@ typedef struct {
   policy_t policy;
 
   // ECONOMIC MODEL
-  // TODO: refactor and move to different data structure
   // Average production per person per day, in dollars
   float daily_production;
 

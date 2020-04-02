@@ -1,0 +1,46 @@
+*** BASIC DEMOGRAPHICS ***
+
+Total number of people in this population
+$N_TOTAL 300000000
+
+Number of people susceptible to the disease
+$N_SUSCEPTIBLE 300000000
+
+*** TRANSMISSION MODEL ***
+
+Contact rates for various situations
+Normal baseline
+$CR_NORMAL
+1.00
+
+Staying at home as much as possible
+$CR_HOME
+0.40
+
+At hospital or quarantine facility (assumes sufficient PPE and good conditions)
+$CR_HOSPITAL
+0.20
+
+*** ECONOMIC IMPACT MODEL ***
+
+Average baseline daily production
+For example, GDP per capita divided by days per year
+$DAILY_PRODUCTION
+160
+
+Proportion of jobs that require employees on site even with stay-at-home orders
+$F_CRITICAL_JOBS
+0.30
+
+Productivity reduction for various conditions
+Mild symptoms, but still going to work
+$PROD_SYMP
+0.80
+
+Impact of social distancing (not full stay-at-home orders) on noncritical jobs
+$PROD_DIST
+0.70
+
+Impact of stay-at-home orders on noncritical jobs
+$PROD_HOME
+0.40

@@ -30,12 +30,12 @@ epi_error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
   pop->cr_normal = 1.0f;
   pop->cr_home = 0.4f;
   pop->cr_hospital = 0.2f;
-  pop->f_critical_jobs = 0.3f;
 
   pop->daily_production = 160.f;
   pop->prod_symp = 0.8f;
   pop->prod_dist = 0.7f;
   pop->prod_home = 0.4f;
+  pop->f_critical_jobs = 0.3f;
 
   uint64 *ptr =
     (uint64 *)calloc(N_POP_ARRAY_FIELDS * disease_duration, sizeof(uint64));

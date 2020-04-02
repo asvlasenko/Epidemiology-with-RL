@@ -23,9 +23,6 @@ typedef enum {
   N_EPI_ERROR
 } epi_error;
 
-#define PASS_ERROR(expr) \
-  {epi_error __err__ = expr; if(__err__ != EPI_ERROR_SUCCESS) return __err__;}
-
 // Model handle
 typedef size_t epi_model;
 

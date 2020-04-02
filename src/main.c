@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,9 +11,21 @@ int main(int argc, char **argv) {
 
   printf("Testing model constructor\n");
 
-  //epi_error_e err;
-  //struct epi_model_s model;
+  epi_error err;
+  epi_model model;
+  epi_scenario scenario = {0, 10, 550, -1};
 
+  err = epi_construct_model(&model, &scenario,
+    "./dat/disease.dat", "./dat/population.dat");
+  assert(err == EPI_ERROR_SUCCESS);
+  printf("  success!\n");
+
+  printf("Testing model destructor\n");
+
+  err = epi_free_model(&model);
+  assert(err == EPI_ERROR_SUCCESS);
+  assert(model == (epi_model)NULL);
+  printf("  success!\n");
 
   //err = epi_construct_model(&model,
   //  const scenario_t *scenario, const char *dis_fname, const char *pop_fname)

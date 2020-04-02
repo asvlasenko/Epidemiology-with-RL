@@ -19,5 +19,6 @@ typedef uint64_t uint64;
 #endif
 
 #include "epi_api.h"
+typedef epi_error epi_error_e;
 
 #endif

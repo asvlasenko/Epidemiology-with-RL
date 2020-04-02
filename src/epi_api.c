@@ -8,13 +8,13 @@ typedef struct epi_model_s {
   // Single population, for now.
   // TODO: implement hierarchical model for multiple populations and transport.
   size_t day;
-  epi_scenario_t scenario;
+  epi_scenario scenario;
   disease_t *disease;
   pop_t *population;
 } epi_model_t;
 
-epi_error_e epi_construct_model(epi_model *out,
-  const epi_scenario_t *scenario, const char *dis_fname,
+epi_error epi_construct_model(epi_model *out,
+  const epi_scenario *scenario, const char *dis_fname,
   const char *pop_fname) {
 
   if (out == NULL || scenario == NULL ||
@@ -28,7 +28,7 @@ epi_error_e epi_construct_model(epi_model *out,
   }
 
   // Set up scenario
-  memcpy(&(model->scenario), scenario, sizeof(epi_scenario_t));
+  memcpy(&(model->scenario), scenario, sizeof(epi_scenario));
   // Outbreak never happens: indicated by t_initial == -1
   if (model->scenario.t_initial < 0 || model->scenario.n_initial == 0) {
     model->scenario.t_initial = -1;
@@ -48,7 +48,7 @@ epi_error_e epi_construct_model(epi_model *out,
   }
 
   // Read disease data file
-  epi_error_e err;
+  epi_error err;
   err = create_disease_from_file(&(model->disease), dis_fname);
   if (err != EPI_ERROR_SUCCESS) {
     free(model);
@@ -67,7 +67,7 @@ epi_error_e epi_construct_model(epi_model *out,
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e epi_free_model(epi_model *model) {
+epi_error epi_free_model(epi_model *model) {
   if (model == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }

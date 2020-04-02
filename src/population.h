@@ -35,6 +35,7 @@ typedef struct {
   uint64 n_total;
   uint64 n_susceptible;
   uint64 n_infected;
+  uint64 n_total_critical;
   uint64 n_recovered;
   uint64 n_vaccinated;
   uint64 n_dead;

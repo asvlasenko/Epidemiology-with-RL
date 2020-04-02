@@ -76,9 +76,10 @@ typedef struct epi_input_s {
 // for known positives and negatives, and policies based on test results.
 
 typedef struct epi_observable_s {
-  epi_input current_policy;
+  const epi_input *current_policy;
 
   uint64 n_total;
+  uint64 n_vaccinated;
   uint64 n_dead;
 
   // TODO: at this point, this is reserve capacity.  Model total capacity with
@@ -111,10 +112,10 @@ typedef struct epi_output_s {
 
   size_t max_duration;
 
-  uint64 *n_total_active;
-  uint64 *n_asymptomatic;
-  uint64 *n_symptomatic;
-  uint64 *n_critical;
+  const uint64 *n_total_active;
+  const uint64 *n_asymptomatic;
+  const uint64 *n_symptomatic;
+  const uint64 *n_critical;
 
 } epi_output;
 

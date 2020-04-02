@@ -24,6 +24,12 @@ int main(int argc, char **argv) {
   assert(err == EPI_ERROR_SUCCESS);
   printf("  success!\n");
 
+  printf("Testing model output\n");
+  epi_output output;
+  err = epi_get_output(&output, model);
+  assert(err == EPI_ERROR_SUCCESS);
+  printf("  success!\n");
+
   printf("Testing model destructor\n");
   err = epi_free_model(&model);
   assert(err == EPI_ERROR_SUCCESS);

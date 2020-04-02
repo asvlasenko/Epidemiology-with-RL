@@ -137,6 +137,7 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis) {
   // For now, assume that everyone who reaches max_duration recovers (TODO)
   pop->n_recovered += pop->n_total_active[pop->max_duration - 1];
   pop->n_infected -= pop->n_total_active[pop->max_duration - 1];
+  pop->n_total_critical -= pop->n_critical[pop->max_duration - 1];
 
   // Advance disease time and change population states
   if (pop->n_infected > 0) {
@@ -175,6 +176,7 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis) {
       pop->n_critical[i] = n_c + w_s - r_c - w_c;
 
       pop->n_dead += w_c;
+      pop->n_total_critical += w_s - w_c - r_c;
       pop->n_recovered += r_a + r_s + r_c;
       pop->n_infected -= r_a + r_s + r_c + w_c;
 

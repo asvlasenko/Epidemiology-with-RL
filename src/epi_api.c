@@ -132,7 +132,37 @@ epi_error epi_model_step(epi_model model, const epi_input *input) {
 
 epi_error epi_get_output(epi_output *out, epi_model model) {
 
-  /* ... TODO ... */
+  epi_model_t *mptr = (epi_model_t *)model;
+
+  if(mptr == NULL || out == NULL) {
+    return EPI_ERROR_INVALID_ARGS;
+  }
+
+  if(mptr->population == NULL || mptr->population->n_total_active == NULL) {
+    return EPI_ERROR_INVALID_ARGS;
+  }
+
+  out->obs.current_policy = &(mptr->population->policy);
+  out->obs.n_total = mptr->population->n_total;
+  out->obs.n_vaccinated = mptr->population->n_vaccinated;
+  out->obs.n_dead = mptr->population->n_dead;
+  out->obs.hosp_capacity = mptr->population->n_hospital_beds;
+  out->obs.hosp_demand = mptr->population->n_total_critical;
+  out->obs.finished = mptr->finished;
+
+  out->n_total = mptr->population->n_total;
+  out->n_susceptible = mptr->population->n_susceptible;
+  out->n_infected = mptr->population->n_infected;
+  out->n_recovered = mptr->population->n_recovered;
+  out->n_vaccinated = mptr->population->n_vaccinated;
+  out->n_dead = mptr->population->n_dead;
+
+  out->max_duration = mptr->population->max_duration;
+
+  out->n_total_active = mptr->population->n_total_active;
+  out->n_asymptomatic = mptr->population->n_asymptomatic;
+  out->n_symptomatic = mptr->population->n_symptomatic;
+  out->n_critical = mptr->population->n_critical;
 
   return EPI_ERROR_SUCCESS;
 }

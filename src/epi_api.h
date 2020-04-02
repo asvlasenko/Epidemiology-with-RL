@@ -2,8 +2,12 @@
 #define __EPI_API_H__
 
 // Interface for setting up model, running it, and getting output
+
 #include <stdbool.h>
 #include <stdlib.h>
+
+#include <stdint.h>
+typedef uint64_t uint64;
 
 // Error handling
 typedef enum {
@@ -46,40 +50,72 @@ epi_error epi_construct_model(epi_model *out,
 // Free resources associated with a model.  Sets model pointer to NULL.
 epi_error epi_free_model(epi_model *out);
 
-struct epi_observable_output_s;
-// Observable model output for each step - this is visible to the "player"
-/*
-typedef struct observable_output_s {
-  // ***TODO***
-} observable_output_t;
-*/
-
-// True model output for each step - this is not visible to the "player", but
-// used to record the history and to determine the score
-struct epi_hidden_output_s;
-/*
-typedef struct hidden_output_s {
-  // ***TODO***
-} hidden_output_t;
-*/
-
+// Epidemic control strategies currently in place.
+// For now, this is on a single population basis.  Some redesign will be
+// required for the multi-population model.
 typedef struct epi_input_s {
   // Is social distancing recommended?
   bool dist_recommend;
-
   // Are stay-at-home orders active for people with symptoms?
   bool dist_home_symp;
-
   // Are stay-at-home orders active for everyone?
   bool dist_home_all;
-
   // Are field hospitals and improvised capacity expansion measures in place?
   bool temp_hospitals;
-
   // Is maximum temporary hospital capacity being expanded?
   bool temp_hospital_expansion;
-
 } epi_input;
+
+// Observable model output for each step - this is visible to the "player"
+// For now, this is on a population basis.  Some redesign will be required
+// for the multi-population model.
+
+// TODO: for now, this is very simple: we assume that the number of deaths,
+// total hospital capacity, and demand for hospital capacity is known.
+// This is the situation if no diagnostic test is available.
+
+// In the future, add a testing model, with inputs (testing policy),
+// outputs (number of tests performed and results), separate sub-populations
+// for known positives and negatives, and policies based on test results.
+
+typedef struct epi_observable_s {
+  epi_input current_policy;
+
+  uint64 n_total;
+  uint64 n_dead;
+
+  // TODO: at this point, this is reserve capacity.  Model total capacity with
+  // background typically around 2/3 of total, but variable
+  uint64 hosp_capacity;
+
+  // TODO: background noise on hosp_demand from unrelated causes
+  uint64 hosp_demand;
+
+  // TODO: estimated number of people who called in sick to work, subject
+  // to background noise
+  // uint64 n_sick;
+} epi_observable;
+
+// True model output for each step - this is not visible to the "player", but
+// is used to determine the score and construct simulation logs
+typedef struct epi_hidden_s {
+  epi_observable obs;
+
+  uint64 n_total;
+  uint64 n_susceptible;
+  uint64 n_infected;
+  uint64 n_recovered;
+  uint64 n_vaccinated;
+  uint64 n_dead;
+
+  size_t max_duration;
+
+  uint64 *n_total_active;
+  uint64 *n_asymptomatic;
+  uint64 *n_symptomatic;
+  uint64 *n_critical;
+
+} epi_hidden;
 
 // Step the model forward by 1 day.
 // obs_out is information visible to the player.
@@ -87,8 +123,8 @@ typedef struct epi_input_s {
 // examination.
 // input is player's choices for response strategies from previous day.
 epi_error model_step(epi_model *model,
-  struct epi_observable_output_s *obs_out,
-  struct epi_hidden_output_s *hidden_out,
-  const struct epi_input_s *input);
+  epi_observable *obs_out,
+  epi_hidden *hidden_out,
+  const epi_input *input);
 
 #endif

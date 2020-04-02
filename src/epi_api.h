@@ -15,6 +15,7 @@ typedef enum {
   EPI_ERROR_MISSING_DATA,
   EPI_ERROR_UNEXPECTED_EOF,
   EPI_ERROR_INVALID_DATA,
+  EPI_ERROR_INVALID_SCENARIO,
   N_EPI_ERROR
 } epi_error_e;
 
@@ -37,8 +38,8 @@ typedef struct scenario_s {
 
 // Create a single-population model from scenario description and 2 data files.
 // First file describes the disease, second one describes the population.
-epi_error_e epi_construct_model(struct epi_model_s *model,
-  const scenario_t *scenario, const char *dis_file, const char *pop_file);
+epi_error_e epi_construct_model(struct epi_model_s **out,
+  const scenario_t *scenario, const char *dis_fname, const char *pop_fname);
 
 // Free resources associated with a model.  Sets model pointer to NULL.
 epi_error_e epi_free_model(struct epi_model_s **model);
@@ -68,6 +69,11 @@ typedef struct input_s {
 } input_t;
 */
 
+// Step the model forward by 1 day.
+// obs_out is information visible to the player.
+// hidden_out is additional information that can be logged for later
+// examination.
+// input is player's choices for response strategies from previous day.
 epi_error_e model_step(struct epi_model_s *model,
   struct epi_observable_output_s *obs_out,
   struct epi_hidden_output_s *hidden_out,

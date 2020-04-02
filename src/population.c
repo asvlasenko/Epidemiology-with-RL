@@ -7,6 +7,10 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis);
 // Calculate fraction of critical cases that can be hospitalized
 static float calc_hosp_rate(const pop_t *pop);
 
+epi_error_e create_pop_from_file(pop_t **out, const char *fname) {
+  return EPI_ERROR_SUCCESS;
+}
+
 epi_error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
   if (out == NULL || n_people == 0 || disease_duration == 0) {
     return EPI_ERROR_INVALID_ARGS;

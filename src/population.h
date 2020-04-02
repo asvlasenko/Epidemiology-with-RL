@@ -67,6 +67,9 @@ typedef struct {
 // and returns a NULL pointer.
 epi_error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration);
 
+// Create population from data file
+epi_error_e create_pop_from_file(pop_t **out, const char *fname);
+
 // Frees population struct and associated data.  Nulls population pointer.
 // Returns 1 if disease pointer is NULL, or if its internal data is NULL.
 epi_error_e free_pop(pop_t **pop);

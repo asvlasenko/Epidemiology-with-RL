@@ -37,8 +37,8 @@ typedef struct {
   int t_max;
 } epi_scenario;
 
-// Create a single-population model from scenario description and 2 data files.
-// First file describes the disease, second one describes the population.
+// Create a single-population model from scenario description,
+// a disease data file and a population data file
 epi_error epi_construct_model(epi_model *out,
   const epi_scenario *scenario, const
   char *dis_fname, const char *pop_fname);

@@ -58,19 +58,11 @@ typedef struct {
 
 } pop_t;
 
-// Constructs and fills out population information.
-// Population starts out uninfected.
-// Returns pointer to the population data structure.
-// This pointer should be freed with the free_pop() function.
-// If construction fails, frees any partially allocated resources
-// and returns a NULL pointer.
-epi_error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration);
-
 // Create population from data file
-epi_error_e create_pop_from_file(pop_t **out, const char *fname);
+epi_error_e create_pop_from_file(pop_t **out, const char *fname,
+  size_t disease_duration);
 
 // Frees population struct and associated data.  Nulls population pointer.
-// Returns 1 if disease pointer is NULL, or if its internal data is NULL.
 epi_error_e free_pop(pop_t **pop);
 
 // Infect members of the population.  If requested number of infected exceeds

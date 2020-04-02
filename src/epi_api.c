@@ -56,7 +56,8 @@ epi_error epi_construct_model(epi_model *out,
   }
 
   // Read population data file
-  err = create_pop_from_file(&(model->population), pop_fname);
+  err = create_pop_from_file(&(model->population), pop_fname,
+    model->disease->max_duration);
   if (err != EPI_ERROR_SUCCESS) {
     free_disease(&(model->disease));
     free(model);

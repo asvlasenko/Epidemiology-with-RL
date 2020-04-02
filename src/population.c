@@ -11,7 +11,9 @@ static float calc_hosp_rate(const pop_t *pop);
 // Read population parameters
 static epi_error_e read_pop_params(pop_t *pop, FILE *fp);
 
-epi_error_e create_pop_from_file(pop_t **out, const char *fname) {
+epi_error_e create_pop_from_file(pop_t **out, const char *fname,
+  size_t disease_duration) {
+
   if (out == NULL || fname == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -33,6 +35,22 @@ epi_error_e create_pop_from_file(pop_t **out, const char *fname) {
     free(pop);
     return err;
   }
+
+  uint64 *ptr =
+    (uint64 *)calloc(N_POP_ARRAY_FIELDS * disease_duration, sizeof(uint64));
+  if (ptr == NULL) {
+    return EPI_ERROR_OUT_OF_MEMORY;
+  }
+
+  pop->n_total_active = ptr;
+  pop->n_asymptomatic = &ptr[disease_duration];
+  pop->n_symptomatic = &ptr[2*disease_duration];
+  pop->n_critical = &ptr[3*disease_duration];
+
+  // Some paranoia to catch bugs due to incomplete changes
+  // to population data type
+  uint64 *ptr_last = &pop->n_critical[disease_duration-1];
+  assert(ptr_last - ptr == N_POP_ARRAY_FIELDS * disease_duration - 1);
 
   *out = pop;
   return EPI_ERROR_SUCCESS;
@@ -60,52 +78,6 @@ static epi_error_e read_pop_params(pop_t *pop, FILE *fp) {
   PASS_ERROR(read_float_token(&(pop->prod_dist), fp, "PROD_DIST"));
   PASS_ERROR(read_float_token(&(pop->prod_home), fp, "PROD_HOME"));
 
-  return EPI_ERROR_SUCCESS;
-}
-
-epi_error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
-  if (out == NULL || n_people == 0 || disease_duration == 0) {
-    return EPI_ERROR_INVALID_ARGS;
-  }
-
-  pop_t *pop = (pop_t *)calloc(1, sizeof(pop_t));
-  if (pop == NULL) {
-    return EPI_ERROR_OUT_OF_MEMORY;
-  }
-
-  pop->n_total = n_people;
-  pop->n_susceptible = n_people;
-  pop->max_duration = disease_duration;
-
-  // TODO: Setting some magic numbers here for now, should really be
-  // read from a file
-  pop->cr_normal = 1.0f;
-  pop->cr_home = 0.4f;
-  pop->cr_hospital = 0.2f;
-
-  pop->daily_production = 160.f;
-  pop->prod_symp = 0.8f;
-  pop->prod_dist = 0.7f;
-  pop->prod_home = 0.4f;
-  pop->f_critical_jobs = 0.3f;
-
-  uint64 *ptr =
-    (uint64 *)calloc(N_POP_ARRAY_FIELDS * disease_duration, sizeof(uint64));
-  if (ptr == NULL) {
-    return EPI_ERROR_OUT_OF_MEMORY;
-  }
-
-  pop->n_total_active = ptr;
-  pop->n_asymptomatic = &ptr[disease_duration];
-  pop->n_symptomatic = &ptr[2*disease_duration];
-  pop->n_critical = &ptr[3*disease_duration];
-
-  // Some paranoia to catch bugs due to incomplete changes
-  // to population data type
-  uint64 *ptr_last = &pop->n_critical[disease_duration-1];
-  assert(ptr_last - ptr == N_POP_ARRAY_FIELDS * disease_duration - 1);
-
-  *out = pop;
   return EPI_ERROR_SUCCESS;
 }
 

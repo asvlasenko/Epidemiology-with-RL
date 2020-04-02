@@ -63,13 +63,23 @@ typedef struct hidden_output_s {
 } hidden_output_t;
 */
 
-// TODO: integrate with policy.h, as input describes policy at given time
-struct epi_input_s;
-/*
-typedef struct input_s {
-  // ***TODO***
-} input_t;
-*/
+typedef struct epi_input_s {
+  // Is social distancing recommended?
+  bool dist_recommend;
+
+  // Are stay-at-home orders active for people with symptoms?
+  bool dist_home_symp;
+
+  // Are stay-at-home orders active for everyone?
+  bool dist_home_all;
+
+  // Are field hospitals and improvised capacity expansion measures in place?
+  bool temp_hospitals;
+
+  // Is maximum temporary hospital capacity being expanded?
+  bool temp_hospital_expansion;
+
+} epi_input;
 
 // Step the model forward by 1 day.
 // obs_out is information visible to the player.

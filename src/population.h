@@ -3,13 +3,12 @@
 
 #include "common.h"
 #include "disease.h"
-#include "policy.h"
 
 // Population structure
 #define N_POP_ARRAY_FIELDS 4
 typedef struct {
   // Disease control policy in place for this population
-  policy_t policy;
+  epi_input policy;
 
   // ECONOMIC MODEL
   // Average production per person per day, in dollars

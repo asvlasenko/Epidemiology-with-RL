@@ -5,16 +5,18 @@
 #define INITIAL_POPULATION 300000000
 
 int main(int argc, char **argv) {
-  int err;
+  error_e err;
 
   printf("Initializing model\n");
-  disease_t *disease = create_disease_from_file("./dat/disease.dat");
-  assert(disease != NULL);
+  disease_t *disease;
+  err = create_disease_from_file(&disease, "./dat/disease.dat");
+  assert(err == ERROR_SUCCESS);
   printf("  success!\n");
 
   printf("Creating test population\n");
-  pop_t *test_pop = create_pop(INITIAL_POPULATION, disease->max_duration);
-  assert(test_pop != NULL);
+  pop_t *test_pop;
+  err = create_pop(&test_pop, INITIAL_POPULATION, disease->max_duration);
+  assert(err = ERROR_SUCCESS);
   printf("  success!\n");
 
   // TODO: temporary hospital bed setup to model United States

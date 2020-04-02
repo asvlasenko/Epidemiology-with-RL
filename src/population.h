@@ -65,27 +65,27 @@ typedef struct {
 // This pointer should be freed with the free_pop() function.
 // If construction fails, frees any partially allocated resources
 // and returns a NULL pointer.
-pop_t *create_pop(uint64 n_total, size_t disease_duration);
+error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration);
 
 // Frees population struct and associated data.  Nulls population pointer.
 // Returns 1 if disease pointer is NULL, or if its internal data is NULL.
-int free_pop(pop_t **pop);
+error_e free_pop(pop_t **pop);
 
 // Infect members of the population.  If requested number of infected exceeds
 // the total susceptible population, then the entire susceptible population
 // becomes infected.
-int infect_pop(pop_t *pop, uint64 n_cases);
+error_e infect_pop(pop_t *pop, uint64 n_cases);
 
 // Evolve the population forward by one day
 // TODO: add an argument that encodes government policies to control
 // the disease
-int evolve_pop(pop_t *pop, const disease_t *dis);
+error_e evolve_pop(pop_t *pop, const disease_t *dis);
 
 // Control measure: add hospital beds to population
-void add_hosp_capacity(pop_t *pop, uint64 n_beds);
+error_e add_hosp_capacity(pop_t *pop, uint64 n_beds);
 
 // Print info, for debug purposes
-void print_pop_info(size_t t, const pop_t *pop);
+error_e print_pop_info(size_t t, const pop_t *pop);
 
 // Calculate ratio of critical cases to hospital capacity
 float hospital_load(const pop_t *pop);

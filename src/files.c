@@ -1,75 +1,76 @@
 #include "files.h"
 
-int read_size_token(size_t *s, FILE *fp, const char *token_name) {
-  if (find_token_in_file(fp, token_name)) {
-    printf("Error: no %s token in file", token_name);
-    return 1;
+error_e read_size_token(size_t *s, FILE *fp, const char *token_name) {
+  if (s == NULL || fp == NULL || token_name == NULL) {
+    return ERROR_INVALID_ARGS;
   }
+
+  PASS_ERROR(find_token_in_file(fp, token_name));
 
   char buf[MAX_LINE_SIZE];
   if (fgets(buf, MAX_LINE_SIZE, fp) == NULL) {
-    printf("Error: unexpected EOF\n");
-    return 1;
+    return ERROR_UNEXPECTED_EOF;
   }
 
   int result = atoi(buf);
   if (result <= 0) {
-    printf("Error: invalid or missing size token value\n");
-    return 1;
+    return ERROR_INVALID_DATA;
   }
 
   *s = result;
-  return 0;
+  return ERROR_SUCCESS;
 }
 
-int read_float_token(float *f, FILE *fp, const char *token_name) {
-  if (find_token_in_file(fp, token_name)) {
-    printf("Error: no %s token in file", token_name);
-    return 1;
+error_e read_float_token(float *f, FILE *fp, const char *token_name) {
+  if (f == NULL || fp == NULL || token_name == NULL) {
+    return ERROR_INVALID_ARGS;
   }
+
+  PASS_ERROR(find_token_in_file(fp, token_name));
 
   char buf[MAX_LINE_SIZE];
   if (fgets(buf, MAX_LINE_SIZE, fp) == NULL) {
-    printf("Error: unexpected EOF\n");
-    return 1;
+    return ERROR_UNEXPECTED_EOF;
   }
 
   double result = atof(buf);
   if ((result == 0.0 && buf[0] != '0' && buf[0] != '.') || result < 0.0) {
-    printf("Error: invalid or missing value for %s\n", token_name);
-    return 1;
+    return ERROR_INVALID_DATA;
   }
 
   *f = (float)result;
-  return 0;
+  return ERROR_SUCCESS;
 }
 
-int read_float_array(float *f, size_t size, FILE *fp, const char *token_name) {
-  if (find_token_in_file(fp, token_name)) {
-    printf("Error: no %s token in file", token_name);
-    return 1;
+error_e read_float_array(float *f, size_t size, FILE *fp, const char *token_name) {
+  if (f == NULL || size == 0 || fp == NULL || token_name == NULL) {
+    return ERROR_INVALID_ARGS;
   }
+
+  PASS_ERROR(find_token_in_file(fp, token_name));
 
   char buf[MAX_LINE_SIZE];
   for (size_t i = 0; i < size; i++) {
     if (fgets(buf, MAX_LINE_SIZE, fp) == NULL) {
-      printf("Error: unexpected EOF\n");
-      return 1;
+      return ERROR_UNEXPECTED_EOF;
     }
 
     double result = atof(buf);
     if ((result == 0.0 && buf[0] != '0' && buf[0] != '.') || result < 0.0) {
-      printf("Error: invalid or missing value for %s\n", token_name);
-      return 1;
+      return ERROR_INVALID_DATA;
     }
 
     f[i] = (float)result;
   }
 
-  return 0;
+  return ERROR_SUCCESS;
 }
 
-int find_token_in_file(FILE *fp, const char *token_name) {
+error_e find_token_in_file(FILE *fp, const char *token_name) {
+  if (fp == NULL || token_name == NULL) {
+    return ERROR_INVALID_ARGS;
+  }
+
   char buf[MAX_LINE_SIZE];
   char tok[MAX_LINE_SIZE];
   sprintf(tok, "$%s\n", token_name);
@@ -77,9 +78,9 @@ int find_token_in_file(FILE *fp, const char *token_name) {
   fseek(fp, 0, SEEK_SET);
   while (fgets(buf, MAX_LINE_SIZE, fp) != NULL) {
     if (!strcmp(buf, tok)) {
-      return 0;
+      return ERROR_SUCCESS;
     }
   }
 
-  return 1;
+  return ERROR_MISSING_DATA;
 }

@@ -2,21 +2,19 @@
 #include "population.h"
 
 // Calculate average infection rate
-float calc_inf_rate(const pop_t *pop, const disease_t *dis);
+static float calc_inf_rate(const pop_t *pop, const disease_t *dis);
 
 // Calculate fraction of critical cases that can be hospitalized
-float calc_hosp_rate(const pop_t *pop);
+static float calc_hosp_rate(const pop_t *pop);
 
-pop_t *create_pop(uint64 n_people, size_t disease_duration) {
-  if (n_people == 0 || disease_duration == 0) {
-    printf("create_pop(): invalid arguments\n");
-    return NULL;
+error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
+  if (out == NULL || n_people == 0 || disease_duration == 0) {
+    return ERROR_INVALID_ARGS;
   }
 
   pop_t *pop = (pop_t *)calloc(1, sizeof(pop_t));
   if (pop == NULL) {
-    printf("create_pop(): calloc failed on creating population object\n");
-    return NULL;
+    return ERROR_OUT_OF_MEMORY;
   }
 
   pop->n_total = n_people;
@@ -38,9 +36,7 @@ pop_t *create_pop(uint64 n_people, size_t disease_duration) {
   uint64 *ptr =
     (uint64 *)calloc(N_POP_ARRAY_FIELDS * disease_duration, sizeof(uint64));
   if (ptr == NULL) {
-    printf("create_pop(): calloc failed on creating population data\n");
-    free(pop);
-    return NULL;
+    return ERROR_OUT_OF_MEMORY;
   }
 
   pop->n_total_active = ptr;
@@ -53,29 +49,35 @@ pop_t *create_pop(uint64 n_people, size_t disease_duration) {
   uint64 *ptr_last = &pop->n_critical[disease_duration-1];
   assert(ptr_last - ptr == N_POP_ARRAY_FIELDS * disease_duration - 1);
 
-  return pop;
+  *out = pop;
+  return ERROR_SUCCESS;
 }
 
-int free_pop(pop_t **pop) {
-  if (pop == NULL || *pop == NULL) {
-    return 1;
+error_e free_pop(pop_t **pop) {
+  if (pop == NULL) {
+    return ERROR_INVALID_ARGS;
+  }
+
+  if (*pop == NULL) {
+    return ERROR_SUCCESS;
   }
 
   if ((*pop)->n_total_active == NULL) {
     free(*pop);
     *pop = NULL;
-    return 1;
+    return ERROR_SUCCESS;
   }
 
   free((*pop)->n_total_active);
   (*pop)->n_total_active = NULL;
+  free(*pop);
   *pop = NULL;
-  return 0;
+  return ERROR_SUCCESS;
 }
 
-int infect_pop(pop_t *pop, uint64 n_cases) {
+error_e infect_pop(pop_t *pop, uint64 n_cases) {
   if (pop == NULL || pop->n_total_active == NULL) {
-    return 1;
+    return ERROR_INVALID_ARGS;
   }
 
   if (n_cases > pop->n_susceptible) {
@@ -86,19 +88,17 @@ int infect_pop(pop_t *pop, uint64 n_cases) {
   pop->n_infected += n_cases;
   pop->n_total_active[0] += n_cases;
   pop->n_asymptomatic[0] += n_cases;
-  return 0;
+  return ERROR_SUCCESS;
 }
 
-int evolve_pop(pop_t *pop, const disease_t *dis) {
+error_e evolve_pop(pop_t *pop, const disease_t *dis) {
   if (pop == NULL || pop->n_total_active == NULL) {
-    return 1;
+    return ERROR_INVALID_ARGS;
   }
 
   if (dis == NULL || dis->p_transmit == NULL) {
-    return 1;
+    return ERROR_INVALID_ARGS;
   }
-
-  uint64 err;
 
   // Death rate modifier based on availability of hospital beds
   float hr = calc_hosp_rate(pop);
@@ -134,12 +134,9 @@ int evolve_pop(pop_t *pop, const disease_t *dis) {
       uint64 w_c = 0;   // Critical dies
 
       // Estimate # of transitions by drawing from a double binomial distribution
-      err = approx_dbin_draw(&r_a, &w_a, p_r, p_s, n_a);
-      assert(!err);
-      err = approx_dbin_draw(&r_s, &w_s, p_r, p_c, n_s);
-      assert(!err);
-      err = approx_dbin_draw(&r_c, &w_c, p_r, p_d, n_c);
-      assert(!err);
+      PASS_ERROR(approx_dbin_draw(&r_a, &w_a, p_r, p_s, n_a));
+      PASS_ERROR(approx_dbin_draw(&r_s, &w_s, p_r, p_c, n_s));
+      PASS_ERROR(approx_dbin_draw(&r_c, &w_c, p_r, p_d, n_c));
 
       // Update number of people in different categories, for this infection day
       pop->n_total_active[i] = n_t - r_a - r_s - r_c - w_c;
@@ -166,24 +163,32 @@ int evolve_pop(pop_t *pop, const disease_t *dis) {
 
   float infection_rate = calc_inf_rate(pop, dis);
   uint64 n_infected;
-  err = approx_bin_draw(&n_infected,
+  PASS_ERROR(approx_bin_draw(&n_infected,
                         infection_rate / (float)pop->n_susceptible,
-                        pop->n_susceptible);
-  assert(!err);
-  infect_pop(pop, n_infected);
+                        pop->n_susceptible));
+  PASS_ERROR(infect_pop(pop, n_infected));
 
   // DEBUG: Check conservation by entire population
   assert(pop->n_total == pop->n_susceptible + pop->n_infected
     + pop->n_recovered + pop->n_dead + pop->n_vaccinated);
 
-  return 0;
+  return ERROR_SUCCESS;
 }
 
-void add_hosp_capacity(pop_t *pop, uint64 n_beds) {
+error_e add_hosp_capacity(pop_t *pop, uint64 n_beds) {
+  if (pop == NULL) {
+    return ERROR_INVALID_ARGS;
+  }
   pop->n_hospital_beds += n_beds;
+  return ERROR_SUCCESS;
 }
 
-void print_pop_info(size_t t, const pop_t *pop) {
+// Temporary debug function, print to command line for testing
+error_e print_pop_info(size_t t, const pop_t *pop) {
+  if (pop == NULL) {
+    return ERROR_INVALID_ARGS;
+  }
+
   printf("%I64u %I64u %I64u %I64u %I64u %I64u %f %f\n",
     t,
     pop->n_total,
@@ -194,9 +199,11 @@ void print_pop_info(size_t t, const pop_t *pop) {
     hospital_load(pop),
     productivity_loss(pop)/1e9
   );
+
+  return ERROR_SUCCESS;
 }
 
-float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
+static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
 
   // Weights for how often asymptomatic, symptomatic and critical people come
   // into contact with each other.  These are affected by the population's
@@ -263,7 +270,7 @@ float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
   return inf_rate;
 }
 
-float calc_hosp_rate(const pop_t *pop) {
+static float calc_hosp_rate(const pop_t *pop) {
   if (!pop->n_hospital_beds) {
     return 0.f;
   }

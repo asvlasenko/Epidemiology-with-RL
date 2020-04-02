@@ -1,16 +1,17 @@
 #include "approx_binomial.h"
 
 // Draw a number of events from a Poisson distribution
-int poisson_draw(uint64 *k, float rate);
+static error_e poisson_draw(uint64 *k, float rate);
 
 // Generate a normally distributed floating point number
 // with mean = 0 and variance = 1
-float rand_normal();
+static float rand_normal();
 
-int approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n) {
-  // Error cases
+error_e approx_dbin_draw(uint64 *nx, uint64 *ny,
+  float p_x, float p_y, uint64 n) {
+
   if (nx == NULL || ny == NULL || p_x + p_y > 1.f || p_x < 0.f || p_y < 0.f) {
-    return 1;
+    return ERROR_INVALID_ARGS;
   }
 
   // First, find probability of either event X or event Y
@@ -19,7 +20,7 @@ int approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n) {
   // Edge case: zero events expected
   if (p_xy * n == 0.f) {
     *nx = *ny = 0;
-    return 0;
+    return ERROR_SUCCESS;
   }
 
   // Get number of events x + events y
@@ -27,13 +28,13 @@ int approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n) {
 
   int err;
   err = approx_bin_draw(&nxy, p_xy, n);
-  if (err) {
-    return 1;
+  if (err != ERROR_SUCCESS) {
+    return err;
   }
 
   if (nxy == 0) {
     *nx = *ny = 0;
-    return 0;
+    return ERROR_SUCCESS;
   }
 
   // Get number of events x, specifically
@@ -41,23 +42,22 @@ int approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n) {
   if (p_x == 0.f) {
     *nx = 0;
     *ny = nxy;
-    return 0;
+    return ERROR_SUCCESS;
   }
   if (p_y == 0.f) {
     *nx = nxy;
     *ny = 0;
-    return 0;
+    return ERROR_SUCCESS;
   }
 
   // Probability of x, given that either x or y occurred
   float p = p_x / (p_x + p_y);
   err = approx_bin_draw(nx, p, nxy);
   if (err) {
-    return 1;
+    return err;
   }
   *ny = nxy - *nx;
-
-  return 0;
+  return ERROR_SUCCESS;
 }
 
 // Outcome probability cutoff for approximating binomial distribution
@@ -68,16 +68,15 @@ int approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n) {
 // distribution as a Gaussian distribution
 #define GAUSSIAN_CUTOFF 0.5
 
-int approx_bin_draw(uint64 *k, float p, uint64 n) {
-  // Error cases
+error_e approx_bin_draw(uint64 *k, float p, uint64 n) {
   if (k == NULL || p < 0.f || p > 1.f) {
-    return 1;
+    return ERROR_INVALID_ARGS;
   }
 
   // Edge case, p == 0 or n == 0
   if (p * n == 0.f) {
     *k = 0;
-    return 0;
+    return ERROR_SUCCESS;
   }
 
   // Work with smaller probability
@@ -88,7 +87,7 @@ int approx_bin_draw(uint64 *k, float p, uint64 n) {
     // <= used instead of == in case of rounding error in last step
     if (p * n <= 0.f) {
       *k = n;
-      return 0;
+      return ERROR_SUCCESS;
     }
     swap = true;
   }
@@ -99,7 +98,7 @@ int approx_bin_draw(uint64 *k, float p, uint64 n) {
   if (p <= POISSON_CUTOFF) {
     do {
       if (poisson_draw(&result, p * n)) {
-        return 1;
+        return ERROR_UNEXPECTED_STATE;
       }
     } while (result > n);
   } else {
@@ -137,19 +136,19 @@ int approx_bin_draw(uint64 *k, float p, uint64 n) {
   }
 
   *k = swap ? n - result : result;
-  return 0;
+  return ERROR_SUCCESS;
 }
 
 // Max steps in accept-reject method before we assume there is an error
 #define POISSON_MAX_STEPS 1024
 
-int poisson_draw(uint64 *k, float rate) {
+static error_e poisson_draw(uint64 *k, float rate) {
   if (k == NULL || rate < 0.f) {
-    return 1;
+    return ERROR_INVALID_ARGS;
   }
   if (rate == 0.f) {
     *k = 0;
-    return 0;
+    return ERROR_SUCCESS;
   }
 
   // For large rates, use accept-reject method based on normal approximation
@@ -200,14 +199,13 @@ int poisson_draw(uint64 *k, float rate) {
   // failed (which should hopefully be extremely improbable)
 
   float z = exp(-rate);
-
   // Rate is too high and the accept-reject algorithm failed,
-  // we don't know what to do about it
+  // this should never happen
   if (z == 0.f) {
-    printf("Error: Poisson generator failed on rate = %f\n", rate);
-    return 1;
+    return ERROR_UNEXPECTED_STATE;
   }
 
+  // Knuth algorithm
   uint64 n = 0;
   float p = 1.f;
   do {
@@ -216,11 +214,11 @@ int poisson_draw(uint64 *k, float rate) {
     p *= u;
   } while (p > z);
   *k = n - 1;
-  return 0;
+  return ERROR_SUCCESS;
 }
 
 // Marsaglia's algorithm for generating normally distributed random numbers
-float rand_normal() {
+static float rand_normal() {
   float x, y, r2;
   do {
     x = (float)rand() / (float)RAND_MAX;

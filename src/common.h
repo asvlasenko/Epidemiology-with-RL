@@ -18,4 +18,6 @@ typedef uint64_t uint64;
 #define M_PI 3.1415926536
 #endif
 
+#include "error.h"
+
 #endif

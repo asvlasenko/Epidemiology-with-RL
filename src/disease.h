@@ -30,11 +30,11 @@ typedef struct {
 // This pointer should be freed with the free_disease() function.
 // If construction fails, frees any partially allocated resources
 // and returns a NULL pointer.
-error_e create_disease_from_file(disease_t **dis, const char *filename);
+epi_error_e create_disease_from_file(disease_t **dis, const char *filename);
 
 // Frees disease struct and associated data.  Sets disease pointer to NULL.
 // Returns 1 if disease pointer is NULL, or if its internal data is NULL.
-int free_disease(disease_t **dis);
+epi_error_e free_disease(disease_t **dis);
 
 
 #endif

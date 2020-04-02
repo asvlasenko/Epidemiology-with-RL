@@ -7,14 +7,14 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis);
 // Calculate fraction of critical cases that can be hospitalized
 static float calc_hosp_rate(const pop_t *pop);
 
-error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
+epi_error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
   if (out == NULL || n_people == 0 || disease_duration == 0) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
 
   pop_t *pop = (pop_t *)calloc(1, sizeof(pop_t));
   if (pop == NULL) {
-    return ERROR_OUT_OF_MEMORY;
+    return EPI_ERROR_OUT_OF_MEMORY;
   }
 
   pop->n_total = n_people;
@@ -36,7 +36,7 @@ error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
   uint64 *ptr =
     (uint64 *)calloc(N_POP_ARRAY_FIELDS * disease_duration, sizeof(uint64));
   if (ptr == NULL) {
-    return ERROR_OUT_OF_MEMORY;
+    return EPI_ERROR_OUT_OF_MEMORY;
   }
 
   pop->n_total_active = ptr;
@@ -50,34 +50,34 @@ error_e create_pop(pop_t **out, uint64 n_people, size_t disease_duration) {
   assert(ptr_last - ptr == N_POP_ARRAY_FIELDS * disease_duration - 1);
 
   *out = pop;
-  return ERROR_SUCCESS;
+  return EPI_ERROR_SUCCESS;
 }
 
-error_e free_pop(pop_t **pop) {
+epi_error_e free_pop(pop_t **pop) {
   if (pop == NULL) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
 
   if (*pop == NULL) {
-    return ERROR_SUCCESS;
+    return EPI_ERROR_SUCCESS;
   }
 
   if ((*pop)->n_total_active == NULL) {
     free(*pop);
     *pop = NULL;
-    return ERROR_SUCCESS;
+    return EPI_ERROR_SUCCESS;
   }
 
   free((*pop)->n_total_active);
   (*pop)->n_total_active = NULL;
   free(*pop);
   *pop = NULL;
-  return ERROR_SUCCESS;
+  return EPI_ERROR_SUCCESS;
 }
 
-error_e infect_pop(pop_t *pop, uint64 n_cases) {
+epi_error_e infect_pop(pop_t *pop, uint64 n_cases) {
   if (pop == NULL || pop->n_total_active == NULL) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
 
   if (n_cases > pop->n_susceptible) {
@@ -88,16 +88,16 @@ error_e infect_pop(pop_t *pop, uint64 n_cases) {
   pop->n_infected += n_cases;
   pop->n_total_active[0] += n_cases;
   pop->n_asymptomatic[0] += n_cases;
-  return ERROR_SUCCESS;
+  return EPI_ERROR_SUCCESS;
 }
 
-error_e evolve_pop(pop_t *pop, const disease_t *dis) {
+epi_error_e evolve_pop(pop_t *pop, const disease_t *dis) {
   if (pop == NULL || pop->n_total_active == NULL) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
 
   if (dis == NULL || dis->p_transmit == NULL) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
 
   // Death rate modifier based on availability of hospital beds
@@ -172,21 +172,21 @@ error_e evolve_pop(pop_t *pop, const disease_t *dis) {
   assert(pop->n_total == pop->n_susceptible + pop->n_infected
     + pop->n_recovered + pop->n_dead + pop->n_vaccinated);
 
-  return ERROR_SUCCESS;
+  return EPI_ERROR_SUCCESS;
 }
 
-error_e add_hosp_capacity(pop_t *pop, uint64 n_beds) {
+epi_error_e add_hosp_capacity(pop_t *pop, uint64 n_beds) {
   if (pop == NULL) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
   pop->n_hospital_beds += n_beds;
-  return ERROR_SUCCESS;
+  return EPI_ERROR_SUCCESS;
 }
 
 // Temporary debug function, print to command line for testing
-error_e print_pop_info(size_t t, const pop_t *pop) {
+epi_error_e print_pop_info(size_t t, const pop_t *pop) {
   if (pop == NULL) {
-    return ERROR_INVALID_ARGS;
+    return EPI_ERROR_INVALID_ARGS;
   }
 
   printf("%I64u %I64u %I64u %I64u %I64u %I64u %f %f\n",
@@ -200,7 +200,7 @@ error_e print_pop_info(size_t t, const pop_t *pop) {
     productivity_loss(pop)/1e9
   );
 
-  return ERROR_SUCCESS;
+  return EPI_ERROR_SUCCESS;
 }
 
 static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {

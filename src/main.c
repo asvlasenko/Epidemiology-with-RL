@@ -7,18 +7,18 @@
 #define INITIAL_POPULATION 300000000
 
 int main(int argc, char **argv) {
-  error_e err;
+  epi_error_e err;
 
   printf("Initializing model\n");
   disease_t *disease;
   err = create_disease_from_file(&disease, "./dat/disease.dat");
-  assert(err == ERROR_SUCCESS);
+  assert(err == EPI_ERROR_SUCCESS);
   printf("  success!\n");
 
   printf("Creating test population\n");
   pop_t *test_pop;
   err = create_pop(&test_pop, INITIAL_POPULATION, disease->max_duration);
-  assert(err == ERROR_SUCCESS);
+  assert(err == EPI_ERROR_SUCCESS);
   printf("  success!\n");
 
   // TODO: temporary hospital bed setup to model United States

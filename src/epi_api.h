@@ -5,7 +5,21 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "error.h"
+// Error handling
+typedef enum {
+  EPI_ERROR_SUCCESS = 0,
+  EPI_ERROR_INVALID_ARGS,
+  EPI_ERROR_FILE_NOT_FOUND,
+  EPI_ERROR_OUT_OF_MEMORY,
+  EPI_ERROR_UNEXPECTED_STATE,
+  EPI_ERROR_MISSING_DATA,
+  EPI_ERROR_UNEXPECTED_EOF,
+  EPI_ERROR_INVALID_DATA,
+  N_EPI_ERROR
+} epi_error_e;
+
+#define PASS_ERROR(expr) \
+  {epi_error_e err = expr; if(err != EPI_ERROR_SUCCESS) return err;}
 
 struct epi_model_s;
 
@@ -23,11 +37,11 @@ typedef struct scenario_s {
 
 // Create a single-population model from scenario description and 2 data files.
 // First file describes the disease, second one describes the population.
-error_e epi_construct_model(struct epi_model_s *model,
+epi_error_e epi_construct_model(struct epi_model_s *model,
   const scenario_t *scenario, const char *dis_file, const char *pop_file);
 
 // Free resources associated with a model.  Sets model pointer to NULL.
-error_e epi_free_model(struct epi_model_s **model);
+epi_error_e epi_free_model(struct epi_model_s **model);
 
 struct epi_observable_output_s;
 // Observable model output for each step - this is visible to the "player"
@@ -54,7 +68,7 @@ typedef struct input_s {
 } input_t;
 */
 
-error_e model_step(struct epi_model_s *model,
+epi_error_e model_step(struct epi_model_s *model,
   struct epi_observable_output_s *obs_out,
   struct epi_hidden_output_s *hidden_out,
   const struct epi_input_s *input);

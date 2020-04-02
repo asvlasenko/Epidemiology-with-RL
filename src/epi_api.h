@@ -98,7 +98,7 @@ typedef struct epi_observable_s {
 
 // True model output for each step - this is not visible to the "player", but
 // is used to determine the score and construct simulation logs
-typedef struct epi_hidden_s {
+typedef struct epi_output_s {
   epi_observable obs;
 
   uint64 n_total;
@@ -115,16 +115,15 @@ typedef struct epi_hidden_s {
   uint64 *n_symptomatic;
   uint64 *n_critical;
 
-} epi_hidden;
+} epi_output;
 
 // Step the model forward by 1 day.
 // obs_out is information visible to the player.
 // hidden_out is additional information that can be logged for later
 // examination.
 // input is player's choices for response strategies from previous day.
-epi_error model_step(epi_model *model,
-  epi_observable *obs_out,
-  epi_hidden *hidden_out,
-  const epi_input *input);
+epi_error epi_model_step(epi_model model, const epi_input *input);
+
+epi_error epi_get_output(epi_output *out, epi_model model);
 
 #endif

@@ -8,6 +8,7 @@ typedef struct epi_model_s {
   // Single population, for now.
   // TODO: implement hierarchical model for multiple populations and transport.
   size_t day;
+
   epi_scenario scenario;
   disease_t *disease;
   pop_t *population;
@@ -83,6 +84,26 @@ epi_error epi_free_model(epi_model *model) {
   free_pop(&(ptr->population));
   free(ptr);
   *model = (epi_model)NULL;
+
+  return EPI_ERROR_SUCCESS;
+}
+
+epi_error model_step(epi_model model, const epi_input *input) {
+
+  epi_model_t *mptr = (epi_model_t *)model;
+
+  if (mptr == NULL || input == NULL) {
+    return EPI_ERROR_INVALID_ARGS;
+  }
+
+  /* ... TODO ... */
+
+  return EPI_ERROR_SUCCESS;
+}
+
+epi_error epi_get_output(epi_output *out, epi_model model) {
+
+  /* ... TODO ... */
 
   return EPI_ERROR_SUCCESS;
 }

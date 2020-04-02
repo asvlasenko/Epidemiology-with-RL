@@ -27,8 +27,7 @@ int main(int argc, char **argv) {
   assert(model == (epi_model)NULL);
   printf("  success!\n");
 
-  //err = epi_construct_model(&model,
-  //  const scenario_t *scenario, const char *dis_fname, const char *pop_fname)
+  printf("Testing model step\n");
 
 /*  printf("Initializing model\n");
   disease_t *disease;

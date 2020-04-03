@@ -6,9 +6,7 @@ OBJS = 	./src/epi_lib/approx_binomial.c \
 TEST_SOURCE = ./src/c/main.c
 CC = gcc
 INCLUDE_PATHS = ./include
-LIBRARY_PATHS =
 COMPILER_FLAGS = -std=c99 -Wall -Wfatal-errors
-LINKER_FLAGS =
 
 ifeq ($(OS), Windows_NT)
 	OBJ_NAME = bin\main

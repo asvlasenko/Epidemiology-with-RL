@@ -8,7 +8,7 @@
 #define N_POP_ARRAY_FIELDS 4
 typedef struct {
   // Disease control policy in place for this population
-  epi_input policy;
+  EpiInput policy;
 
   // ECONOMIC MODEL
   // Average production per person per day, in dollars

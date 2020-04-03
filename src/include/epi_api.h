@@ -24,7 +24,8 @@ typedef enum {
 } epi_error;
 
 // Model handle
-typedef void* epi_model;
+typedef struct epi_model_s epi_model_t;
+typedef epi_model_t* EpiModel;
 
 // Scenario description
 typedef struct {
@@ -36,16 +37,16 @@ typedef struct {
   int t_vaccine;
   // How long to run the scenario, -1 = to eradication
   int t_max;
-} epi_scenario;
+} EpiScenario;
 
 // Create a single-population model from scenario description,
 // a disease data file and a population data file
-epi_error epi_construct_model(epi_model *out,
-  const epi_scenario *scenario, const
-  char *dis_fname, const char *pop_fname);
+epi_error epi_construct_model(EpiModel *out,
+  const EpiScenario *scenario,
+  const char *dis_fname, const char *pop_fname);
 
 // Free resources associated with a model.  Sets model pointer to NULL.
-epi_error epi_free_model(epi_model *out);
+epi_error epi_free_model(EpiModel *out);
 
 // Epidemic control strategies currently in place.
 // For now, this is on a single population basis.  Some redesign will be
@@ -63,7 +64,7 @@ typedef struct {
   // Is maximum temporary hospital capacity being expanded?
   bool temp_hospital_expansion;
   // TODO: testing policy
-} epi_input;
+} EpiInput;
 
 // Observable model output for each step - this is visible to the "player"
 // For now, this is on a population basis.  Some redesign will be required
@@ -79,7 +80,7 @@ typedef struct {
 
 typedef struct {
   size_t day;
-  const epi_input *current_policy;
+  const EpiInput *current_policy;
 
   uint64 n_total;
   uint64 n_vaccinated;
@@ -99,12 +100,12 @@ typedef struct {
   // Is the simulation finished?
   bool finished;
 
-} epi_observable;
+} EpiObservable;
 
 // True model output for each step - this is not visible to the "player", but
 // is used to determine the score and construct simulation logs
-typedef struct epi_output_s {
-  epi_observable obs;
+typedef struct {
+  EpiObservable obs;
 
   uint64 n_total;
   uint64 n_susceptible;
@@ -120,15 +121,15 @@ typedef struct epi_output_s {
   const uint64 *n_symptomatic;
   const uint64 *n_critical;
 
-} epi_output;
+} EpiOutput;
 
 // Step the model forward by 1 day.
 // obs_out is information visible to the player.
 // hidden_out is additional information that can be logged for later
 // examination.
 // input is player's choices for response strategies from previous day.
-epi_error epi_model_step(epi_model model, const epi_input *input);
+epi_error epi_model_step(EpiModel model, const EpiInput *input);
 
-epi_error epi_get_output(epi_output *out, epi_model model);
+epi_error epi_get_output(EpiOutput *out, const EpiModel model);
 
 #endif

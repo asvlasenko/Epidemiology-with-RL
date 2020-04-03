@@ -9,13 +9,13 @@ typedef struct epi_model_s {
   bool started;
   bool finished;
 
-  epi_scenario scenario;
+  EpiScenario scenario;
   disease_t *disease;
   pop_t *population;
 } epi_model_t;
 
-epi_error epi_construct_model(epi_model *out,
-  const epi_scenario *scenario, const char *dis_fname,
+epi_error epi_construct_model(EpiModel *out,
+  const EpiScenario *scenario, const char *dis_fname,
   const char *pop_fname) {
 
   if (out == NULL || scenario == NULL ||
@@ -23,13 +23,13 @@ epi_error epi_construct_model(epi_model *out,
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  epi_model_t *model = calloc(1, sizeof(epi_model_t));
+  EpiModel model = calloc(1, sizeof(epi_model_t));
   if (model == NULL) {
     return EPI_ERROR_OUT_OF_MEMORY;
   }
 
   // Set up scenario
-  memcpy(&(model->scenario), scenario, sizeof(epi_scenario));
+  memcpy(&(model->scenario), scenario, sizeof(EpiScenario));
   // Outbreak never happens: indicated by t_initial == -1
   if (model->scenario.t_initial < 0 || model->scenario.n_initial == 0) {
     model->scenario.t_initial = -1;
@@ -65,104 +65,98 @@ epi_error epi_construct_model(epi_model *out,
     return err;
   }
 
-  *out = (epi_model)model;
+  *out = model;
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_free_model(epi_model *model) {
+epi_error epi_free_model(EpiModel *model) {
   if (model == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  epi_model_t *ptr = (epi_model_t *)(*model);
-
-  if (ptr == NULL) {
+  if (*model == NULL) {
     return EPI_ERROR_SUCCESS;
   }
 
-  free_disease(&(ptr->disease));
-  free_pop(&(ptr->population));
-  free(ptr);
-  *model = (epi_model)NULL;
+  free_disease(&((*model)->disease));
+  free_pop(&((*model)->population));
+  free(*model);
+  *model = NULL;
 
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_model_step(epi_model model, const epi_input *input) {
+epi_error epi_model_step(EpiModel model, const EpiInput *input) {
 
-  epi_model_t *mptr = (epi_model_t *)model;
-
-  if (mptr == NULL || input == NULL) {
+  if (model == NULL || input == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
   // If model has finished, do nothing
-  if (mptr->finished) {
-    mptr->day++;
+  if (model->finished) {
+    model->day++;
     return EPI_ERROR_SUCCESS;
   }
 
   // Apply input as current policy
-  memcpy(&mptr->population->policy, input, sizeof(epi_input));
+  memcpy(&model->population->policy, input, sizeof(EpiInput));
 
   // Check for initial infection date
   // TODO: vaccination
-  if (mptr->day == mptr->scenario.t_initial) {
-    PASS_ERROR(infect_pop(mptr->population, mptr->scenario.n_initial));
-    mptr->started = true;
+  if (model->day == model->scenario.t_initial) {
+    PASS_ERROR(infect_pop(model->population, model->scenario.n_initial));
+    model->started = true;
   }
 
   // Check if max simulation time has passed or if disease has been eradicated
-  if ((mptr->started && mptr->population->n_infected == 0) ||
-    mptr->day >= mptr->scenario.t_max) {
+  if ((model->started && model->population->n_infected == 0) ||
+    model->day >= model->scenario.t_max) {
 
-    mptr->day++;
-    mptr->finished = true;
+    model->day++;
+    model->finished = true;
     return EPI_ERROR_SUCCESS;
   }
 
   // Step population forward one day
-  PASS_ERROR(evolve_pop(mptr->population, mptr->disease));
-  mptr->day++;
+  PASS_ERROR(evolve_pop(model->population, model->disease));
+  model->day++;
 
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_get_output(epi_output *out, epi_model model) {
+epi_error epi_get_output(EpiOutput *out, const EpiModel model) {
 
-  epi_model_t *mptr = (epi_model_t *)model;
-
-  if(mptr == NULL || out == NULL) {
+  if(model == NULL || out == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  if(mptr->population == NULL || mptr->population->n_total_active == NULL) {
+  if(model->population == NULL || model->population->n_total_active == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  out->obs.day = mptr->day;
+  out->obs.day = model->day;
 
-  out->obs.current_policy = &(mptr->population->policy);
-  out->obs.n_total = mptr->population->n_total;
-  out->obs.n_vaccinated = mptr->population->n_vaccinated;
-  out->obs.n_dead = mptr->population->n_dead;
-  out->obs.hosp_capacity = mptr->population->n_hospital_beds;
-  out->obs.hosp_demand = mptr->population->n_total_critical;
-  out->obs.finished = mptr->finished;
+  out->obs.current_policy = &(model->population->policy);
+  out->obs.n_total = model->population->n_total;
+  out->obs.n_vaccinated = model->population->n_vaccinated;
+  out->obs.n_dead = model->population->n_dead;
+  out->obs.hosp_capacity = model->population->n_hospital_beds;
+  out->obs.hosp_demand = model->population->n_total_critical;
+  out->obs.finished = model->finished;
 
-  out->n_total = mptr->population->n_total;
-  out->n_susceptible = mptr->population->n_susceptible;
-  out->n_infected = mptr->population->n_infected;
-  out->n_recovered = mptr->population->n_recovered;
-  out->n_vaccinated = mptr->population->n_vaccinated;
-  out->n_dead = mptr->population->n_dead;
+  out->n_total = model->population->n_total;
+  out->n_susceptible = model->population->n_susceptible;
+  out->n_infected = model->population->n_infected;
+  out->n_recovered = model->population->n_recovered;
+  out->n_vaccinated = model->population->n_vaccinated;
+  out->n_dead = model->population->n_dead;
 
-  out->max_duration = mptr->population->max_duration;
+  out->max_duration = model->population->max_duration;
 
-  out->n_total_active = mptr->population->n_total_active;
-  out->n_asymptomatic = mptr->population->n_asymptomatic;
-  out->n_symptomatic = mptr->population->n_symptomatic;
-  out->n_critical = mptr->population->n_critical;
+  out->n_total_active = model->population->n_total_active;
+  out->n_asymptomatic = model->population->n_asymptomatic;
+  out->n_symptomatic = model->population->n_symptomatic;
+  out->n_critical = model->population->n_critical;
 
   return EPI_ERROR_SUCCESS;
 }

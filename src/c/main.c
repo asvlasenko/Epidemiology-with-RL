@@ -11,15 +11,15 @@ int main(int argc, char **argv) {
 
   printf("Testing model constructor\n");
   epi_error err;
-  epi_model model;
-  epi_scenario scenario = {0, 10, 550, -1};
+  EpiModel model;
+  EpiScenario scenario = {0, 10, 550, -1};
   err = epi_construct_model(&model, &scenario,
     "./dat/disease.dat", "./dat/population.dat");
   assert(err == EPI_ERROR_SUCCESS);
   printf("  success!\n");
 
-  epi_input input = {0};
-  epi_output output = {0};
+  EpiInput input = {0};
+  EpiOutput output = {0};
   while(!output.obs.finished) {
     err = epi_model_step(model, &input);
     assert(err == EPI_ERROR_SUCCESS);
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   printf("Testing model destructor\n");
   err = epi_free_model(&model);
   assert(err == EPI_ERROR_SUCCESS);
-  assert(model == (epi_model)NULL);
+  assert(model == NULL);
   printf("  success!\n");
 
 /*  printf("Initializing model\n");

@@ -11,7 +11,7 @@ typedef uint64_t uint64;
 
 // Error handling
 typedef enum {
-  EPI_ERROR_SUCCESS = 0,
+  EPI_ERROR_SUCCESS,
   EPI_ERROR_INVALID_ARGS,
   EPI_ERROR_FILE_NOT_FOUND,
   EPI_ERROR_OUT_OF_MEMORY,
@@ -50,17 +50,19 @@ epi_error epi_free_model(epi_model *out);
 // Epidemic control strategies currently in place.
 // For now, this is on a single population basis.  Some redesign will be
 // required for the multi-population model.
-typedef struct epi_input_s {
+typedef struct {
   // Is social distancing recommended?
   bool dist_recommend;
   // Are stay-at-home orders active for people with symptoms?
   bool dist_home_symp;
   // Are stay-at-home orders active for everyone?
   bool dist_home_all;
+  // TODO: measures below not yet implemented
   // Are field hospitals and improvised capacity expansion measures in place?
   bool temp_hospitals;
   // Is maximum temporary hospital capacity being expanded?
   bool temp_hospital_expansion;
+  // TODO: testing policy
 } epi_input;
 
 // Observable model output for each step - this is visible to the "player"
@@ -75,7 +77,7 @@ typedef struct epi_input_s {
 // outputs (number of tests performed and results), separate sub-populations
 // for known positives and negatives, and policies based on test results.
 
-typedef struct epi_observable_s {
+typedef struct {
   size_t day;
   const epi_input *current_policy;
 

@@ -12,24 +12,24 @@ LIBRARY_PATHS =
 COMPILER_FLAGS = -std=c99 -Wall -Wfatal-errors
 LINKER_FLAGS =
 
-#Linux
-#CLEANUP = rm -f *.o
-
-#MinGW
-CLEANUP = del /f *.o
+ifeq ($(OS), Windows_NT)
+	CLEAN_O = del /f *.o
+	CLEAN_BIN = del /f $(OBJ_NAME).exe $(LIB_NAME)
+else
+	CLEAN_O = rm -f *.o
+	CLEAN_BIN = rm -f $(OBJ_NAME) $(LIB_NAME)
+endif
 
 build:
 	$(CC) -c $(OBJS) $(COMPILER_FLAGS)
 	$(CC) -shared -o $(LIB_NAME) *.o
 	$(CC) -o $(OBJ_NAME) $(TEST_SOURCE) $(LIB_NAME) $(COMPILER_FLAGS)
-	$(CLEANUP)
+	$(CLEAN_O)
 
 run:
 	$(OBJ_NAME)
 
 clean:
-#Linux
-#	rm -f $(OBJ_NAME) $(LIB_NAME)
-
+	$(CLEAN_BIN)
 #MinGW
 	del /f $(OBJ_NAME).exe $(LIB_NAME)

@@ -5,17 +5,19 @@ OBJS = 	./src/epi_lib/approx_binomial.c \
 				./src/epi_lib/population.c
 TEST_SOURCE = ./src/c/main.c
 CC = gcc
-OBJ_NAME = ./bin/main
-LIB_NAME = ./bin/epi_lib.so
 INCLUDE_PATHS = ./include
 LIBRARY_PATHS =
 COMPILER_FLAGS = -std=c99 -Wall -Wfatal-errors
 LINKER_FLAGS =
 
 ifeq ($(OS), Windows_NT)
+	OBJ_NAME = bin\main
+	LIB_NAME = bin\epi_lib.so
 	CLEAN_O = del /f *.o
 	CLEAN_BIN = del /f $(OBJ_NAME).exe $(LIB_NAME)
 else
+	OBJ_NAME = ./bin/main
+	LIB_NAME = ./bin/epi_lib.so
 	CLEAN_O = rm -f *.o
 	CLEAN_BIN = rm -f $(OBJ_NAME) $(LIB_NAME)
 endif
@@ -31,5 +33,3 @@ run:
 
 clean:
 	$(CLEAN_BIN)
-#MinGW
-	del /f $(OBJ_NAME).exe $(LIB_NAME)

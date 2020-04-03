@@ -24,7 +24,7 @@ typedef enum {
 } epi_error;
 
 // Model handle
-typedef size_t epi_model;
+typedef void* epi_model;
 
 // Scenario description
 typedef struct {

@@ -1,4 +1,4 @@
-OBJS = ./src/*.c
+OBJS = ./src/epi_lib/*.c
 CC = gcc
 OBJ_NAME = ./bin/main
 INCLUDE_PATHS =

@@ -1,13 +1,27 @@
-OBJS = ./src/epi_lib/*.c
+OBJS = 	./src/epi_lib/approx_binomial.c \
+				./src/epi_lib/disease.c \
+				./src/epi_lib/epi_api.c \
+				./src/epi_lib/files.c \
+				./src/epi_lib/population.c
+TEST_SOURCE = main.c
 CC = gcc
 OBJ_NAME = ./bin/main
-INCLUDE_PATHS =
+LIB_NAME = ./bin/epi_lib.so
 LIBRARY_PATHS =
 COMPILER_FLAGS = -std=c99 -Wall -Wfatal-errors
 LINKER_FLAGS =
 
+#Linux
+#CLEANUP = rm -f *.o
+
+#MinGW
+CLEANUP = del /f *.o
+
 build:
-	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) -c $(OBJS) $(COMPILER_FLAGS)
+	$(CC) -shared -o $(LIB_NAME) *.o
+	$(CC) -o $(OBJ_NAME) $(TEST_SOURCE) $(LIB_NAME) $(COMPILER_FLAGS)
+	$(CLEANUP)
 
 run:
 	$(OBJ_NAME)

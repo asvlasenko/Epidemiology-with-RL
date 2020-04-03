@@ -18,7 +18,7 @@ typedef uint64_t uint64;
 #define M_PI 3.1415926536
 #endif
 
-#include "epi_api.h"
+#include "../include/epi_api.h"
 typedef epi_error epi_error_e;
 
 #define PASS_ERROR(expr) \

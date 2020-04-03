@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "./src/epi_lib/epi_api.h"
+#include "../include/epi_api.h"
 
 #define INITIAL_INFECTIONS 10
 #define INITIAL_POPULATION 300000000

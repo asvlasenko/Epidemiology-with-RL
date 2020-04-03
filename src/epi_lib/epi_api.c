@@ -1,5 +1,3 @@
-#include "epi_api.h"
-
 #include "common.h"
 #include "disease.h"
 #include "population.h"

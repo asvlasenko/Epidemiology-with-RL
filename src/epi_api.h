@@ -76,6 +76,7 @@ typedef struct epi_input_s {
 // for known positives and negatives, and policies based on test results.
 
 typedef struct epi_observable_s {
+  size_t day;
   const epi_input *current_policy;
 
   uint64 n_total;

@@ -142,6 +142,8 @@ epi_error epi_get_output(epi_output *out, epi_model model) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
+  out->obs.day = mptr->day;
+
   out->obs.current_policy = &(mptr->population->policy);
   out->obs.n_total = mptr->population->n_total;
   out->obs.n_vaccinated = mptr->population->n_vaccinated;

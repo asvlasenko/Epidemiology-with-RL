@@ -18,16 +18,15 @@ int main(int argc, char **argv) {
   assert(err == EPI_ERROR_SUCCESS);
   printf("  success!\n");
 
-  printf("Testing model step\n");
   epi_input input = {0};
-  err = epi_model_step(model, &input);
-  assert(err == EPI_ERROR_SUCCESS);
-  printf("  success!\n");
-
-  printf("Testing model output\n");
-  epi_output output;
-  err = epi_get_output(&output, model);
-  assert(err == EPI_ERROR_SUCCESS);
+  epi_output output = {0};
+  while(!output.obs.finished) {
+    err = epi_model_step(model, &input);
+    assert(err == EPI_ERROR_SUCCESS);
+    err = epi_get_output(&output, model);
+    assert(err == EPI_ERROR_SUCCESS);
+  }
+  printf("end day = %I64u\n", output.obs.day);
   printf("  success!\n");
 
   printf("Testing model destructor\n");

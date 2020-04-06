@@ -3,9 +3,8 @@ OBJS = 	./src/epi_lib/approx_binomial.c \
 				./src/epi_lib/epi_api.c \
 				./src/epi_lib/files.c \
 				./src/epi_lib/population.c
-TEST_SOURCE = ./src/c/main.c
+TEST_SOURCE = ./src/main.c
 CC = gcc
-INCLUDE_PATHS = ./include
 COMPILER_FLAGS = -std=c99 -Wall -Wfatal-errors
 
 ifeq ($(OS), Windows_NT)

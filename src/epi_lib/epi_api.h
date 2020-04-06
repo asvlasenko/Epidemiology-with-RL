@@ -54,9 +54,9 @@ typedef struct {
   bool dist_home_all;
   // TODO: measures below not yet implemented
   // Are field hospitals and improvised capacity expansion measures in place?
-  bool temp_hospitals;
+  //bool temp_hospitals;
   // Is maximum temporary hospital capacity being expanded?
-  bool temp_hospital_expansion;
+  //bool temp_hospital_expansion;
   // TODO: testing policy
 } EpiInput;
 

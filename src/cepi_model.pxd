@@ -1,5 +1,5 @@
 # cepi_model.pxd
-# Cython API definition
+# Cython API redefinition, corresponding to epi_api.h
 
 cdef extern from "epi_lib/epi_api.h":
 
@@ -7,6 +7,7 @@ cdef extern from "epi_lib/epi_api.h":
     ctypedef struct EpiModel:
         pass
 
+    # Error return values
     ctypedef enum EpiError:
         EPI_ERROR_SUCCESS
         EPI_ERROR_INVALID_ARGS
@@ -19,45 +20,60 @@ cdef extern from "epi_lib/epi_api.h":
         EPI_ERROR_INVALID_SCENARIO
         N_EPI_ERROR
 
+    # Model parameters and data
+    ctypedef struct EpiScenario:
+        # Day of initial infection, negative = never
+        int t_initial
+        # Number of infected in first round
+        size_t n_initial
+        # Time of vaccine arrival, negative = never
+        int t_vaccine
+        # Maximum scenario duration, -1 = until disease is eradicated
+        # Either day of initial infection, or max duration, must be non-negative
+        int t_max
+        # Disease data file name
+        char *dis_fname
+        # Population data file name
+        char *pop_fname
+
+    # Control measures that can be put in place
     ctypedef struct EpiInput:
+        # Moderate social distancing
+        bool dist_recommend
+        # People with symptoms required to self-isolate
+        bool dist_home_symp
+        # Home quarantine orders, except for essential tasks
+        bool dist_home_all
+        # TODO: hospital capacity expansion and testing policies
 
-        // Epidemic control strategies currently in place.
-        // For now, this is on a single population basis.  Some redesign will be
-        // required for the multi-population model.
-        typedef struct {
-          // Is social distancing recommended?
-          bool dist_recommend;
-          // Are stay-at-home orders active for people with symptoms?
-          bool dist_home_symp;
-          // Are stay-at-home orders active for everyone?
-          bool dist_home_all;
-          // TODO: measures below not yet implemented
-          // Are field hospitals and improvised capacity expansion measures in place?
-          bool temp_hospitals;
-          // Is maximum temporary hospital capacity being expanded?
-          bool temp_hospital_expansion;
-          // TODO: testing policy
-        } EpiInput;
+    ctypedef unsigned long long uint64
 
-        // Observable model output for each step - this is visible to the "player"
-        // For now, this is on a population basis.  Some redesign will be required
-        // for the multi-population model.
+    # Observable output from model
+    # TODO: for now, the player can see the real situation. Add a testing model.
+    ctypedef struct EpiObservable:
+        size_t day
 
-        // TODO: introduce testing model.  For now, we simply assume that the player
-        // knows the number of infected, critical cases and deaths.
+        bool finished
+        bool vaccine_available
 
-        typedef struct {
-          size_t day;
+        uint64 hosp_capacity
 
-          bool finished;
-          bool vaccine_available;
+        uint64 n_susceptible
+        uint64 n_infected
+        uint64 n_critical
+        uint64 n_recovered
+        uint64 n_vaccinated
+        uint64 n_dead
 
-          uint64 hosp_capacity;
+    # Create a single-population model from scenario description,
+    # a disease data file and a population data file
+    EpiError epi_construct_model(EpiModel *out, const EpiScenario *scenario)
 
-          uint64 n_susceptible;
-          uint64 n_infected;
-          uint64 n_critical;
-          uint64 n_recovered;
-          uint64 n_vaccinated;
-          uint64 n_dead;
-        } EpiObservable;
+    # Free resources associated with a model.  Sets model pointer to NULL.
+    EpiError epi_free_model(EpiModel *out)
+
+    # Step model forward by one day, based on measures given in input
+    EpiError epi_model_step(EpiModel model, const EpiInput *input)
+
+    # Get observable output from model
+    EpiError epi_get_observables(EpiObservable *out, const EpiModel model)

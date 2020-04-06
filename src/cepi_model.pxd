@@ -1,11 +1,12 @@
 # cepi_model.pxd
 # Cython API redefinition, corresponding to epi_api.h
-
-cdef extern from "epi_lib/epi_api.h":
+cdef extern from "./epi_lib/epi_api.h":
 
     # Opaque handle to model
-    ctypedef struct EpiModel:
+    ctypedef struct _EpiModel:
         pass
+
+    ctypedef _EpiModel* EpiModel
 
     # Error return values
     ctypedef enum EpiError:
@@ -37,43 +38,43 @@ cdef extern from "epi_lib/epi_api.h":
         char *pop_fname
 
     # Control measures that can be put in place
-    ctypedef struct EpiInput:
+    #ctypedef struct EpiInput:
         # Moderate social distancing
-        bool dist_recommend
+    #    bool dist_recommend
         # People with symptoms required to self-isolate
-        bool dist_home_symp
+    #    bool dist_home_symp
         # Home quarantine orders, except for essential tasks
-        bool dist_home_all
+    #    bool dist_home_all
         # TODO: hospital capacity expansion and testing policies
 
-    ctypedef unsigned long long uint64
+    #ctypedef unsigned long long uint64
 
     # Observable output from model
     # TODO: for now, the player can see the real situation. Add a testing model.
-    ctypedef struct EpiObservable:
-        size_t day
+    #ctypedef struct EpiObservable:
+    #    size_t day
 
-        bool finished
-        bool vaccine_available
+    #    bool finished
+    #    bool vaccine_available
 
-        uint64 hosp_capacity
+    #    uint64 hosp_capacity
 
-        uint64 n_susceptible
-        uint64 n_infected
-        uint64 n_critical
-        uint64 n_recovered
-        uint64 n_vaccinated
-        uint64 n_dead
+    #    uint64 n_susceptible
+    #    uint64 n_infected
+    #    uint64 n_critical
+    #    uint64 n_recovered
+    #    uint64 n_vaccinated
+    #    uint64 n_dead
 
     # Create a single-population model from scenario description,
     # a disease data file and a population data file
-    EpiError epi_construct_model(EpiModel *out, const EpiScenario *scenario)
+    EpiError epi_construct_model(EpiModel *out, EpiScenario *sc)
 
     # Free resources associated with a model.  Sets model pointer to NULL.
     EpiError epi_free_model(EpiModel *out)
 
     # Step model forward by one day, based on measures given in input
-    EpiError epi_model_step(EpiModel model, const EpiInput *input)
+    #EpiError epi_model_step(EpiModel model, const EpiInput *input)
 
     # Get observable output from model
-    EpiError epi_get_observables(EpiObservable *out, const EpiModel model)
+    #EpiError epi_get_observables(EpiObservable *out, const EpiModel model)

@@ -1,2 +1,5 @@
 bin/
 *.o
+*.pyd
+src/epi_model.c
+build/

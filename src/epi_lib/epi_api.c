@@ -15,12 +15,10 @@ typedef struct epi_model_s {
   pop_t *population;
 } epi_model_t;
 
-epi_error epi_construct_model(EpiModel *out,
-  const EpiScenario *scenario, const char *dis_fname,
-  const char *pop_fname) {
+epi_error epi_construct_model(EpiModel *out, const EpiScenario *scenario) {
 
   if (out == NULL || scenario == NULL ||
-    dis_fname == NULL || pop_fname == NULL) {
+    scenario->dis_fname == NULL || scenario->pop_fname == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
@@ -51,14 +49,14 @@ epi_error epi_construct_model(EpiModel *out,
 
   // Read disease data file
   epi_error err;
-  err = create_disease_from_file(&(model->disease), dis_fname);
+  err = create_disease_from_file(&(model->disease), scenario->dis_fname);
   if (err != EPI_ERROR_SUCCESS) {
     free(model);
     return err;
   }
 
   // Read population data file
-  err = create_pop_from_file(&(model->population), pop_fname,
+  err = create_pop_from_file(&(model->population), scenario->pop_fname,
     model->disease->max_duration);
   if (err != EPI_ERROR_SUCCESS) {
     free_disease(&(model->disease));

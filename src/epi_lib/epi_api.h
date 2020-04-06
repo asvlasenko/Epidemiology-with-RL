@@ -37,13 +37,15 @@ typedef struct {
   int t_vaccine;
   // How long to run the scenario, -1 = to eradication
   int t_max;
+  // Name of disease data file
+  char *dis_fname;
+  // Name of population data file
+  char *pop_fname;
 } EpiScenario;
 
 // Create a single-population model from scenario description,
 // a disease data file and a population data file
-epi_error epi_construct_model(EpiModel *out,
-  const EpiScenario *scenario,
-  const char *dis_fname, const char *pop_fname);
+epi_error epi_construct_model(EpiModel *out, const EpiScenario *scenario);
 
 // Free resources associated with a model.  Sets model pointer to NULL.
 epi_error epi_free_model(EpiModel *out);

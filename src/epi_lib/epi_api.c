@@ -8,6 +8,7 @@ typedef struct epi_model_s {
   size_t day;
   bool started;
   bool finished;
+  bool vaccine_available;
 
   EpiScenario scenario;
   disease_t *disease;
@@ -102,10 +103,14 @@ epi_error epi_model_step(EpiModel model, const EpiInput *input) {
   memcpy(&model->population->policy, input, sizeof(EpiInput));
 
   // Check for initial infection date
-  // TODO: vaccination
   if (model->day == model->scenario.t_initial) {
     PASS_ERROR(infect_pop(model->population, model->scenario.n_initial));
     model->started = true;
+  }
+
+  // Check if vaccine has become available
+  if (!model->vaccine_available && model->day == model->scenario.t_vaccine) {
+    model->vaccine_available = true;
   }
 
   // Check if max simulation time has passed or if disease has been eradicated
@@ -124,7 +129,7 @@ epi_error epi_model_step(EpiModel model, const EpiInput *input) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_get_output(EpiOutput *out, const EpiModel model) {
+epi_error epi_get_observables(EpiObservable *out, const EpiModel model) {
 
   if(model == NULL || out == NULL) {
     return EPI_ERROR_INVALID_ARGS;
@@ -134,29 +139,19 @@ epi_error epi_get_output(EpiOutput *out, const EpiModel model) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  out->obs.day = model->day;
+  out->day = model->day;
 
-  out->obs.current_policy = &(model->population->policy);
-  out->obs.n_total = model->population->n_total;
-  out->obs.n_vaccinated = model->population->n_vaccinated;
-  out->obs.n_dead = model->population->n_dead;
-  out->obs.hosp_capacity = model->population->n_hospital_beds;
-  out->obs.hosp_demand = model->population->n_total_critical;
-  out->obs.finished = model->finished;
+  out->finished = model->finished;
+  out->vaccine_available = model->vaccine_available;
 
-  out->n_total = model->population->n_total;
+  out->hosp_capacity = model->population->n_hospital_beds;
+
   out->n_susceptible = model->population->n_susceptible;
   out->n_infected = model->population->n_infected;
+  out->n_critical = model->population->n_total_critical;
   out->n_recovered = model->population->n_recovered;
   out->n_vaccinated = model->population->n_vaccinated;
   out->n_dead = model->population->n_dead;
-
-  out->max_duration = model->population->max_duration;
-
-  out->n_total_active = model->population->n_total_active;
-  out->n_asymptomatic = model->population->n_asymptomatic;
-  out->n_symptomatic = model->population->n_symptomatic;
-  out->n_critical = model->population->n_critical;
 
   return EPI_ERROR_SUCCESS;
 }

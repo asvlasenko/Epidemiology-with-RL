@@ -19,14 +19,14 @@ int main(int argc, char **argv) {
   printf("  success!\n");
 
   EpiInput input = {0};
-  EpiOutput output = {0};
-  while(!output.obs.finished) {
+  EpiObservable output = {0};
+  while(!output.finished) {
     err = epi_model_step(model, &input);
     assert(err == EPI_ERROR_SUCCESS);
-    err = epi_get_output(&output, model);
+    err = epi_get_observables(&output, model);
     assert(err == EPI_ERROR_SUCCESS);
   }
-  printf("end day = %I64u\n", output.obs.day);
+  printf("end day = %I64u\n", output.day);
   printf("  success!\n");
 
   printf("Testing model destructor\n");

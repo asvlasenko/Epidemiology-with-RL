@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,8 +17,6 @@ typedef uint64_t uint64;
 #ifndef M_PI
 #define M_PI 3.1415926536
 #endif
-
-typedef int bool;
 
 #include "../include/epi_api.h"
 typedef epi_error epi_error_e;

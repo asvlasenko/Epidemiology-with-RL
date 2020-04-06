@@ -64,72 +64,33 @@ typedef struct {
   // Is maximum temporary hospital capacity being expanded?
   bool temp_hospital_expansion;
   // TODO: testing policy
+
 } EpiInput;
 
 // Observable model output for each step - this is visible to the "player"
 // For now, this is on a population basis.  Some redesign will be required
 // for the multi-population model.
 
-// TODO: for now, this is very simple: we assume that the number of deaths,
-// total hospital capacity, and demand for hospital capacity is known.
-// This is the situation if no diagnostic test is available.
-
-// In the future, add a testing model, with inputs (testing policy),
-// outputs (number of tests performed and results), separate sub-populations
-// for known positives and negatives, and policies based on test results.
+// TODO: introduce testing model.  For now, we simply assume that the player
+// knows the number of infected, critical cases and deaths.
 
 typedef struct {
   size_t day;
-  const EpiInput *current_policy;
 
-  uint64 n_total;
-  uint64 n_vaccinated;
-  uint64 n_dead;
+  bool finished;
+  bool vaccine_available;
 
-  // TODO: at this point, this is reserve capacity.  Model total capacity with
-  // background typically around 2/3 of total, but variable
   uint64 hosp_capacity;
 
-  // TODO: background noise on hosp_demand from unrelated causes
-  uint64 hosp_demand;
-
-  // TODO: estimated number of people who called in sick to work, subject
-  // to background noise
-  // uint64 n_sick;
-
-  // Is the simulation finished?
-  bool finished;
-
-} EpiObservable;
-
-// True model output for each step - this is not visible to the "player", but
-// is used to determine the score and construct simulation logs
-typedef struct {
-  EpiObservable obs;
-
-  uint64 n_total;
   uint64 n_susceptible;
   uint64 n_infected;
+  uint64 n_critical;
   uint64 n_recovered;
   uint64 n_vaccinated;
   uint64 n_dead;
+} EpiObservable;
 
-  size_t max_duration;
-
-  const uint64 *n_total_active;
-  const uint64 *n_asymptomatic;
-  const uint64 *n_symptomatic;
-  const uint64 *n_critical;
-
-} EpiOutput;
-
-// Step the model forward by 1 day.
-// obs_out is information visible to the player.
-// hidden_out is additional information that can be logged for later
-// examination.
-// input is player's choices for response strategies from previous day.
 epi_error epi_model_step(EpiModel model, const EpiInput *input);
-
-epi_error epi_get_output(EpiOutput *out, const EpiModel model);
+epi_error epi_get_observables(EpiObservable *out, const EpiModel model);
 
 #endif

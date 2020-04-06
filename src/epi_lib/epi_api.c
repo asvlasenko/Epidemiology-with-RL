@@ -2,7 +2,7 @@
 #include "disease.h"
 #include "population.h"
 
-typedef struct epi_model_s {
+struct _EpiModel {
   // Single population, for now.
   // TODO: implement hierarchical model for multiple populations and transport.
   size_t day;
@@ -13,16 +13,16 @@ typedef struct epi_model_s {
   EpiScenario scenario;
   disease_t *disease;
   pop_t *population;
-} epi_model_t;
+};
 
-epi_error epi_construct_model(EpiModel *out, const EpiScenario *scenario) {
+EpiError epi_construct_model(EpiModel *out, const EpiScenario *scenario) {
 
   if (out == NULL || scenario == NULL ||
     scenario->dis_fname == NULL || scenario->pop_fname == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  EpiModel model = calloc(1, sizeof(epi_model_t));
+  EpiModel model = calloc(1, sizeof(struct _EpiModel));
   if (model == NULL) {
     return EPI_ERROR_OUT_OF_MEMORY;
   }
@@ -48,7 +48,7 @@ epi_error epi_construct_model(EpiModel *out, const EpiScenario *scenario) {
   }
 
   // Read disease data file
-  epi_error err;
+  EpiError err;
   err = create_disease_from_file(&(model->disease), scenario->dis_fname);
   if (err != EPI_ERROR_SUCCESS) {
     free(model);
@@ -68,7 +68,7 @@ epi_error epi_construct_model(EpiModel *out, const EpiScenario *scenario) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_free_model(EpiModel *model) {
+EpiError epi_free_model(EpiModel *model) {
   if (model == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -85,7 +85,7 @@ epi_error epi_free_model(EpiModel *model) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_model_step(EpiModel model, const EpiInput *input) {
+EpiError epi_model_step(EpiModel model, const EpiInput *input) {
 
   if (model == NULL || input == NULL) {
     return EPI_ERROR_INVALID_ARGS;
@@ -127,7 +127,7 @@ epi_error epi_model_step(EpiModel model, const EpiInput *input) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error epi_get_observables(EpiObservable *out, const EpiModel model) {
+EpiError epi_get_observables(EpiObservable *out, const EpiModel model) {
 
   if(model == NULL || out == NULL) {
     return EPI_ERROR_INVALID_ARGS;

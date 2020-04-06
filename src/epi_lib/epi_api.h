@@ -21,10 +21,10 @@ typedef enum {
   EPI_ERROR_INVALID_DATA,
   EPI_ERROR_INVALID_SCENARIO,
   N_EPI_ERROR
-} epi_error;
+} EpiError;
 
 // Opaque handle for model
-typedef struct epi_model_s* EpiModel;
+typedef struct _EpiModel* EpiModel;
 
 // Scenario description
 typedef struct {
@@ -42,13 +42,6 @@ typedef struct {
   char *pop_fname;
 } EpiScenario;
 
-// Create a single-population model from scenario description,
-// a disease data file and a population data file
-epi_error epi_construct_model(EpiModel *out, const EpiScenario *scenario);
-
-// Free resources associated with a model.  Sets model pointer to NULL.
-epi_error epi_free_model(EpiModel *out);
-
 // Epidemic control strategies currently in place.
 // For now, this is on a single population basis.  Some redesign will be
 // required for the multi-population model.
@@ -65,7 +58,6 @@ typedef struct {
   // Is maximum temporary hospital capacity being expanded?
   bool temp_hospital_expansion;
   // TODO: testing policy
-
 } EpiInput;
 
 // Observable model output for each step - this is visible to the "player"
@@ -91,7 +83,17 @@ typedef struct {
   uint64 n_dead;
 } EpiObservable;
 
-epi_error epi_model_step(EpiModel model, const EpiInput *input);
-epi_error epi_get_observables(EpiObservable *out, const EpiModel model);
+// Create a single-population model from scenario description,
+// a disease data file and a population data file
+EpiError epi_construct_model(EpiModel *out, const EpiScenario *scenario);
+
+// Free resources associated with a model.  Sets model pointer to NULL.
+EpiError epi_free_model(EpiModel *out);
+
+// Step model forward by one day, based on measures given in input
+EpiError epi_model_step(EpiModel model, const EpiInput *input);
+
+// Get observable output from model
+EpiError epi_get_observables(EpiObservable *out, const EpiModel model);
 
 #endif

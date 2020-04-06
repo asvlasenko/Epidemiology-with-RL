@@ -19,9 +19,9 @@ typedef uint64_t uint64;
 #endif
 
 #include "epi_api.h"
-typedef epi_error epi_error_e;
+typedef EpiError epi_error_e;
 
 #define PASS_ERROR(expr) \
-  {epi_error __err__ = expr; if(__err__ != EPI_ERROR_SUCCESS) return __err__;}
+  {EpiError __err__ = expr; if(__err__ != EPI_ERROR_SUCCESS) return __err__;}
 
 #endif

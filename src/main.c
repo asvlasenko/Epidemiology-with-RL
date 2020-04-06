@@ -10,7 +10,7 @@
 int main(int argc, char **argv) {
 
   printf("Testing model constructor\n");
-  epi_error err;
+  EpiError err;
   EpiModel model;
   EpiScenario scenario = {0, 10, 550, -1,
     "./dat/disease.dat", "./dat/population.dat"};

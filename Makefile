@@ -12,11 +12,13 @@ ifeq ($(OS), Windows_NT)
 	LIB_NAME = bin\epi_lib.so
 	CLEAN_O = del /f *.o
 	CLEAN_BIN = del /f $(OBJ_NAME).exe $(LIB_NAME)
+	CLEAN_BUILD = rd build
 else
 	OBJ_NAME = ./bin/main
 	LIB_NAME = ./bin/epi_lib.so
 	CLEAN_O = rm -f *.o
 	CLEAN_BIN = rm -f $(OBJ_NAME) $(LIB_NAME)
+	CLEAN_BUILD = rm -f build
 endif
 
 build:
@@ -30,3 +32,4 @@ run:
 
 clean:
 	$(CLEAN_BIN)
+	$(CLEAN_BUILD)

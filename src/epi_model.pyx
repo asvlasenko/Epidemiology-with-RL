@@ -28,3 +28,15 @@ cdef class EpiModel:
         cdef cepi_model.EpiError err
         err = cepi_model.epi_free_model(&self._c_model)
         HandleError(err)
+
+    def step(self, cepi_model.EpiInput input):
+        cdef cepi_model.EpiError err
+        err = cepi_model.epi_model_step(self._c_model, &input)
+        HandleError(err)
+
+    def get_observable(self):
+        cdef cepi_model.EpiError err
+        cdef cepi_model.EpiObservable output
+        err = cepi_model.epi_get_observables(&output, self._c_model)
+        HandleError(err)
+        return output

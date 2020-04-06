@@ -197,7 +197,7 @@ static epi_error_e poisson_draw(uint64 *k, float rate) {
   }
 
   // If we got here, either the rate is low, or the accept-reject algorithm
-  // failed (which should hopefully be extremely improbable)
+  // failed (which should be astronomically improbable)
 
   float z = (float)exp(-rate);
   // Rate is too high and the accept-reject algorithm failed,

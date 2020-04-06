@@ -23,9 +23,8 @@ typedef enum {
   N_EPI_ERROR
 } epi_error;
 
-// Model handle
-typedef struct epi_model_s epi_model_t;
-typedef epi_model_t* EpiModel;
+// Opaque handle for model
+typedef struct epi_model_s* EpiModel;
 
 // Scenario description
 typedef struct {

@@ -248,7 +248,7 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
   // who are known positive and / or quarantined.
 
   float wa = pop->cr_normal;
-  float ws = 0.5 * (pop->cr_normal + pop->cr_home);
+  float ws = 0.5f * (pop->cr_normal + pop->cr_home);
   float wc = pop->cr_home;
   float wh = pop->cr_hospital;
 
@@ -258,7 +258,7 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
     // People without critical jobs stay at home, and even those with
     // critical jobs spend more time at home than usual
     wa = pop->cr_home * (1.f - fcj)
-       + 0.5 * (pop->cr_normal + pop->cr_home) * fcj;
+       + 0.5f * (pop->cr_normal + pop->cr_home) * fcj;
     ws = pop->cr_home;
   }
   else {
@@ -266,7 +266,7 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
       ws = pop->cr_home;
     }
     if (pop->policy.dist_recommend) {
-      wa = 0.5 * (pop->cr_normal + pop->cr_home);
+      wa = 0.5f * (pop->cr_normal + pop->cr_home);
     }
   }
 

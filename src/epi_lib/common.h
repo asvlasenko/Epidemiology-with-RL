@@ -1,6 +1,10 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+// When compiling on Windows, keep Microsoft from warning you to use their
+// libraries instead of standard ones
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>

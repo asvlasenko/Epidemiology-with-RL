@@ -103,7 +103,7 @@ epi_error_e approx_bin_draw(uint64 *k, float p, uint64 n) {
     } while (result > n);
   } else {
     float ev = p * n;
-    float std = sqrt(ev * (1.f - p));
+    float std = (float)sqrt(ev * (1.f - p));
 
     // standard deviation of k << <k>: use Gaussian sampling, retry
     // if we end up with k < 0 or k > n
@@ -154,10 +154,10 @@ static epi_error_e poisson_draw(uint64 *k, float rate) {
   // For large rates, use accept-reject method based on normal approximation
   // TODO: add reference (it's in a 1979 paper somewhere)
   if (rate > 30.f) {
-    float c = 0.767 - 3.36 / rate;
-    float b = M_PI / sqrt(3.f * rate);
+    float c = 0.767f - 3.36f / rate;
+    float b = (float)M_PI / (float)sqrt(3.f * rate);
     float a = b * rate;
-    float z = log(c/b) - rate;
+    float z = (float)log(c/b) - rate;
 
     for(size_t i = 0; i < POISSON_MAX_STEPS; i++) {
       float u = (float)rand() / (float)RAND_MAX;
@@ -172,7 +172,7 @@ static epi_error_e poisson_draw(uint64 *k, float rate) {
         u -= v;
       }
 
-      float x = (a - log(v/u))/b;
+      float x = (a - (float)log(v/u))/b;
 
       // Reject negative results
       if (x + 0.5f <= 0.f) {
@@ -186,9 +186,10 @@ static epi_error_e poisson_draw(uint64 *k, float rate) {
         w = 1.f / (float)RAND_MAX;
       }
       float y = a - b * x;
-      float d = 1.f + exp(y);
+      float d = 1.f + (float)exp(y);
       d *= d;
-      if (y + log(w/d) <= z + n*log(rate) - lgamma((float)n + 1.f)) {
+      if (y + (float)log(w/d) <=
+        z + n*(float)log(rate) - (float)lgamma((float)n + 1.f)) {
         *k = n;
         return 0;
       }
@@ -198,7 +199,7 @@ static epi_error_e poisson_draw(uint64 *k, float rate) {
   // If we got here, either the rate is low, or the accept-reject algorithm
   // failed (which should hopefully be extremely improbable)
 
-  float z = exp(-rate);
+  float z = (float)exp(-rate);
   // Rate is too high and the accept-reject algorithm failed,
   // this should never happen
   if (z == 0.f) {
@@ -228,5 +229,5 @@ static float rand_normal() {
     r2 = x * x + y * y;
   } while(r2 >= 1.f || r2 <= 0.f);
 
-  return x * sqrt(-2.f * log(r2) / r2);
+  return x * (float)sqrt(-2.f * log(r2) / r2);
 }

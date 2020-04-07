@@ -39,10 +39,8 @@ class Memory:
         self.reward[i] = reward
         self.running[i] = 1 - int(done)
 
-        actions = np.zeros(self.n_actions, dtype = np.float32)
-        assert(actions.shape == action.shape)
-        for j in range(0, self.n_actions):
-            actions[j] = float(action[j])
+        actions = np.zeros(self.n_actions, dtype = np.int8)
+        actions[action] = 1.0
         self.action[i] = actions
 
         self.counter += 1
@@ -79,4 +77,30 @@ class Agent:
         self.brain = build_net(n_actions, n_input, 128, 128, learning_rate)
         self.memory = Memory(mem_size, n_actions, n_input)
 
-        #TODO: self.memory
+    # Choose a set of actions
+    def act(self, state):
+        state = state[np.newaxis, :]
+        x = np.random.random()
+
+        # Chance to explore by taking a random action
+        action = np.zeros(n_actions, dtype = np.int8)
+        if x < self.p_random:
+            action = np.random.randint(0, self.n_actions)
+        else:
+            actions = self.brain.predict(state)
+            action = np.argmax(actions)
+
+        return action
+
+    def learn(self):
+        if self.memory.counter < self.batch_size:
+            return
+
+        state, next_state, action, reward, running = \
+            self.memory.batch(self.batch_size)
+
+        eval = self.brain.predict(state)
+        next = self.brain.predict(next_state)
+        target = eval.copy()
+
+        batch_index = np.arange(self.batch_size, dtype = np.int32)

@@ -1,7 +1,6 @@
 # Environment for machine learning agent
 
 import numpy as np
-from random import random
 
 import epi_model as em
 
@@ -16,6 +15,7 @@ class env:
     # availability of vaccine
 
     n_obs = 5
+    n_actions = 8
 
     # p_no_outbreak is the chance that an outbreak does not occur at all.
     # start_day is the earliest and latest possible outbreak times.
@@ -36,30 +36,31 @@ class env:
     def reset():
         sc = em.EpiScenario()
         # Control case: no outbreak occurs
-        x = random()
+        x = np.random.random()
         if x < p_no_outbreak:
             sc.t_initial = -1
             sc.t_max = 1000
         # Random disease start date
-        x = random()
+        x = np.random.random()
         sc.t_initial = (1.0-x)*start_day[0] + x*start_day[1]
         # Random time to vaccination
-        x = random()
+        x = np.random.random()
         sc.t_vaccine = sc.t_initial + (1.0-x)*t_vaccine[0] + x*t_vaccine[1]
         this.world = em.EpiModel(sc)
 
     # Step the world forward based on action, generating output
-    # Action is a boolean array, one for each possible control measure
+    # Action is a set of flags, one for each possible control measure
     # Output follows that of AI Gym: observation, reward, done, info
     # For now, info is the same as observation, however when the testing
     # model is implemented, info will describe the true situation, while
     # observation will describe what is visible to the agent.
     def step(action):
+        assert(action < self.n_actions)
         # Translate action into EpiInput
         input = em.EpiInput()
-        input.dist_recommend = bool(action[0])
-        input.dist_home_symp = bool(action[1])
-        input.dist_home_all = bool(action[2])
+        input.dist_recommend = bool(action & int('0001', 2))
+        input.dist_home_symp = bool(action & int('0010', 2))
+        input.dist_home_all = bool(action & int('0100', 2))
 
         # Take a one-day step
         this.world.step(input)

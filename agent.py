@@ -7,7 +7,6 @@ from keras.optimizers import Adam
 
 # Construct neural network with two hidden layers
 def build_net(n_output, n_input, n1, n2, learning_rate):
-    print(n_output, n_input, n1, n2, learning_rate)
     model = Sequential([Dense(n1, input_shape=(n_input, )),
                         Activation('relu'),
                         Dense(n2),

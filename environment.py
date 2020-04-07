@@ -65,6 +65,10 @@ class env:
             (1.0-x)*self.t_vaccine[0] + x*self.t_vaccine[1]
         self.world = em.EpiModel(sc)
 
+        output = self.world.get_observables()
+        obs = observations(output, self.n_obs)
+        return obs
+
     # Step the world forward based on action, generating output
     # Action is a set of flags, one for each possible control measure
     # Output follows that of AI Gym: observation, reward, done, info

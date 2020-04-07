@@ -78,6 +78,7 @@ static epi_error_e read_pop_params(pop_t *pop, FILE *fp) {
   PASS_ERROR(read_float_token(&(pop->prod_symp), fp, "PROD_SYMP"));
   PASS_ERROR(read_float_token(&(pop->prod_dist), fp, "PROD_DIST"));
   PASS_ERROR(read_float_token(&(pop->prod_home), fp, "PROD_HOME"));
+  PASS_ERROR(read_float_token(&(pop->n_hospital_beds), fp, "N_HOSPITAL_BEDS"));
 
   PASS_ERROR(read_float_token(&(pop->daily_vaccination_capacity), fp,
     "DAILY_VACCINATION_CAPACITY"));

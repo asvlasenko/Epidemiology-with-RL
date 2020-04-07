@@ -30,6 +30,35 @@ class Memory:
         self.reward = np.zeros(self.size, dtype = np.float32)
         self.running = np.zeros(self.size, dtype = np.float32)
 
+    # Store an event
+    # Action is a Boolean array, describing which possible actions are active
+    def store(self, state, next_state, action, reward, done):
+        i = self.counter % self.size    # Circular buffer
+        self.state[i] = state
+        self.next_state[i] = next_state
+        self.reward[i] = reward
+        self.running[i] = 1 - int(done)
+
+        actions = np.zeros(self.n_actions, dtype = np.float32)
+        assert(actions.shape == action.shape)
+        for j in range(0, self.n_actions):
+            actions[j] = float(action[j])
+        self.action[i] = actions
+
+        self.counter += 1
+
+    # Draw a batch of stored events
+    def batch(self, batch_size):
+        max_index = min(self.counter, self.size)
+        batch = np.random.choice(max_index, batch_size)
+        states = self.state[batch]
+        next_states = self.next_state[batch]
+        actions = self.action[batch]
+        rewards = self.reward[batch]
+        running = self.running[batch]
+
+        return states, next_states, actions, rewards, running
+
 # Agent class, consisting of a neural network plus memory record
 class Agent:
     def __init__(self, n_actions, n_input, learning_rate, discount,

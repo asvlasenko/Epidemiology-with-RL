@@ -32,9 +32,6 @@ class env:
 
     # Reset the world
     def reset(self):
-        #sc = em.EpiScenario()
-        #self.world = em.EpiModel(sc)
-
         sc = em.EpiScenario()
         # Control case: no outbreak occurs
         x = np.random.random()

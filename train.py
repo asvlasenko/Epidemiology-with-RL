@@ -1,7 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
-import tensorflow as tf
-from tensorflow import keras
-from keras.models import Sequential
-from keras.layers import Dense, InputLayer
+from keras.layers import Dense, Activation
+from keras.models import Sequential, save_model, load_model
+from keras.optimizers import Adam

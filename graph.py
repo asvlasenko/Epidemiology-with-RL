@@ -1,10 +1,18 @@
 import matplotlib.pyplot as plt
-import epi_model as em
+import numpy as np
 
-print("Constructing model")
-sc = em.EpiScenario()
-model = em.EpiModel(sc)
-print("  success!")
+import epi_model as em
+from environment import env
+import agent
+
+world = env(benchmark = True)
+
+player = agent.Agent(8, 5, 0.0005, 0.99, p_random = 0.0, p_random_min = 0.0)
+player.load()
+
+done = False
+score = 0.0
+obs = world.reset()
 
 day = []
 n_susceptible = []
@@ -14,12 +22,13 @@ n_dead = []
 n_vaccinated = []
 cost_function = []
 
-print("Test run")
-input = em.EpiInput()
-output = model.get_observables()
-while not output.finished:
-    model.step(input)
-    output = model.get_observables()
+while not done:
+    action = player.act(obs)
+    next, reward, done, output = world.step(action)
+    score += reward
+    player.record(obs, next, action, reward, done)
+    obs = next
+
     day.append(output.day)
     n_susceptible.append(output.n_susceptible/1e6)
     n_infected.append(output.n_infected/1e6)
@@ -29,12 +38,9 @@ while not output.finished:
 
     cost_function.append(output.cost_function/1e9)
 
-print("  success!")
-print("  day = ", output.day)
-
 plt.xlabel("time, days")
 plt.ylabel("number, millions")
-plt.title("Control Test: No Measures Taken")
+plt.title("Control Test: Mitigation Measures")
 plt.plot(day, n_susceptible, label = "susceptible")
 plt.plot(day, n_infected, label = "active")
 plt.plot(day, n_recovered, label = "recovered")

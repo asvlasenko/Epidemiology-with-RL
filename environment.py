@@ -38,32 +38,37 @@ class env:
     # start_day is the earliest and latest possible outbreak times.
     # t_vaccine is the shortest and longest time possible between outbreak and
     # vaccine availability.
-    def __init__(self, p_no_outbreak = 0.5, start_day = (0,300),
-            t_vaccine = (400,700)):
+    def __init__(self, benchmark = False, p_no_outbreak = 0.5,
+            start_day = (0,300), t_vaccine = (400,700)):
 
         self.p_no_outbreak = p_no_outbreak
         self.start_day = start_day
         self.t_vaccine = t_vaccine
 
+        self.benchmark = benchmark
         self.reset()
 
     # Reset the world
     # Returns an initial observation, just as with Gym
     def reset(self):
-        sc = em.EpiScenario()
-        # Control case: no outbreak occurs
-        x = np.random.random()
-        if x < self.p_no_outbreak:
-            sc.t_initial = -1
-            sc.t_max = 1000
-        # Random disease start date
-        x = np.random.random()
-        sc.t_initial = (1.0-x)*self.start_day[0] + x*self.start_day[1]
-        # Random time to vaccination
-        x = np.random.random()
-        sc.t_vaccine = sc.t_initial + \
-            (1.0-x)*self.t_vaccine[0] + x*self.t_vaccine[1]
-        self.world = em.EpiModel(sc)
+        if self.benchmark:
+            sc = em.EpiScenario()
+            self.world = em.EpiModel(sc)
+        else:
+            sc = em.EpiScenario()
+            # Control case: no outbreak occurs
+            x = np.random.random()
+            if x < self.p_no_outbreak:
+                sc.t_initial = -1
+                sc.t_max = 1000
+            # Random disease start date
+            x = np.random.random()
+            sc.t_initial = (1.0-x)*self.start_day[0] + x*self.start_day[1]
+            # Random time to vaccination
+            x = np.random.random()
+            sc.t_vaccine = sc.t_initial + \
+                (1.0-x)*self.t_vaccine[0] + x*self.t_vaccine[1]
+            self.world = em.EpiModel(sc)
 
         output = self.world.get_observables()
         obs = observations(output, self.n_obs)

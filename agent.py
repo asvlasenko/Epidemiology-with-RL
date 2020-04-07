@@ -60,7 +60,7 @@ class Memory:
 # Agent class, consisting of a neural network plus memory record
 class Agent:
     def __init__(self, n_actions, n_input, learning_rate, discount,
-        p_random = 1.0, p_random_dec = 0.995, p_random_min = 0.01,
+        p_random = 1.0, p_random_dec = 0.995, p_random_min = 0.005,
         mem_size = 1024*1024, batch_size = 64, fname = "agent_model.h5"):
 
         self.n_actions = n_actions
@@ -74,7 +74,7 @@ class Agent:
         self.batch_size = batch_size
         self.fname = fname
 
-        self.brain = build_net(n_actions, n_input, 16, 16, learning_rate)
+        self.brain = build_net(n_actions, n_input, 256, 256, learning_rate)
         self.memory = Memory(mem_size, n_actions, n_input)
 
     # Choose a set of actions
@@ -118,7 +118,8 @@ class Agent:
                 max(self.p_random * self.p_random_dec, self.p_random_min)
 
     def save(self):
+        print("Saving model as ", self.fname)
         self.brain.save(self.fname)
 
     def load(self):
-        self.brain.load(self.fname)
+        self.brain = load_model(self.fname)

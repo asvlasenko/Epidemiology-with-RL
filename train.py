@@ -5,15 +5,14 @@ from environment import env
 import agent
 
 world = env()
-player = agent.Agent(8, 5, 0.0005, 0.99, p_random = 0.0, p_random_min = 0.0)
-player.load()
+player = agent.Agent(8, 5, 0.0005, 0.99)
 
-n_runs = 100
-scores = []
+n_runs = 500
+losses = []
 
 for i in range(n_runs):
     done = False
-    score = 0.0
+    loss = 0.0
     obs = world.reset()
 
     while not done:
@@ -22,8 +21,12 @@ for i in range(n_runs):
         score += reward
         player.record(obs, next, action, reward, done)
         obs = next
+        player.learn()
 
-    scores.append(score)
-    avg_score = np.mean(scores[max(0,i-100):(i+1)])
-    print("episode ", i, " score %i" % int(score),
-          " average score %i" % int(avg_score))
+    losses.append(loss)
+    avg_loss = np.mean(losses[max(0,i-100):(i+1)])
+    print("run: ", i, " loss: %i" % int(loss),
+          " avg: %i" % int(avg_loss))
+
+    if i % 10 == 9:
+        player.save()

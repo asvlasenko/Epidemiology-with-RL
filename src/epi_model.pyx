@@ -24,8 +24,8 @@ class EpiScenario:
     n_initial = 10
     t_vaccine = 550
     t_max = -1
-    dis_fname = "./dat/disease.dat"
-    pop_fname = "./dat/population.dat"
+    dis_fname = b"./dat/disease.dat"
+    pop_fname = b"./dat/population.dat"
 
 class EpiInput:
     dist_recommend = False
@@ -44,7 +44,7 @@ class EpiObservables:
     n_vaccinated = 0
     n_dead = 0
 
-    def __cinit__(self, cepi_model.EpiObservable obs):
+    def __init__(self, cepi_model.EpiObservable obs):
         self.day = obs.day
         self.finished = obs.finished
         self.vaccine_available = obs.vaccine_available
@@ -63,11 +63,11 @@ cdef class EpiModel:
         cdef cepi_model.EpiScenario sc
 
         sc.t_initial = scenario.t_initial
-        sc.t_initial = scenario.n_initial
-        sc.t_initial = scenario.t_vaccine
-        sc.t_initial = scenario.t_max
-        sc.t_initial = scenario.dis_fname
-        sc.t_initial = scenario.pop_fname
+        sc.n_initial = scenario.n_initial
+        sc.t_vaccine = scenario.t_vaccine
+        sc.t_max = scenario.t_max
+        sc.dis_fname = scenario.dis_fname
+        sc.pop_fname = scenario.pop_fname
 
         cdef cepi_model.EpiError err
         err = cepi_model.epi_construct_model(&self._c_model, &sc)
@@ -82,8 +82,8 @@ cdef class EpiModel:
         cdef cepi_model.EpiInput inp
 
         inp.dist_recommend = input.dist_recommend
-        inp.home_symp = input.home_symp
-        inp.home_all = input.home_all
+        inp.dist_home_symp = input.dist_home_symp
+        inp.dist_home_all = input.dist_home_all
 
         cdef cepi_model.EpiError err
         err = cepi_model.epi_model_step(self._c_model, &inp)

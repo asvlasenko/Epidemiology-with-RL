@@ -4,6 +4,23 @@ import numpy as np
 
 import epi_model as em
 
+# Get observable information from model output
+def observations(output, n_obs):
+    obs = np.zeros(n_obs, dtype = np.float32)
+    n_total = float(output.n_susceptible + output.n_infected \
+            + output.n_recovered + output.n_vaccinated + output.n_dead)
+    # ratio of susceptible to total
+    obs[0] = float(output.n_susceptible) / n_total
+    # ratio of infected to total
+    obs[1] = float(output.n_infected) / n_total
+    # ratio of dead to total
+    obs[2] = float(output.n_dead) / n_total
+    # ratio of critical to hospital beds
+    obs[3] = float(output.n_critical) / output.hosp_capacity
+    # availability of vaccine
+    obs[4] = float(output.vaccine_available)
+    return obs
+
 class env:
     # Number of observations
     # For now, keep track of:
@@ -31,6 +48,7 @@ class env:
         self.reset()
 
     # Reset the world
+    # Returns an initial observation, just as with Gym
     def reset(self):
         sc = em.EpiScenario()
         # Control case: no outbreak occurs
@@ -66,21 +84,7 @@ class env:
 
         # Get observations and other info
         output = self.world.get_observables()
-
-        # Observations
-        obs = np.zeros(this.n_obs, dtype = np.float32)
-        n_total = float(obs.n_susceptible + obs.n_infected + obs.n_recovered
-                + obs.n_vaccinated + obs.n_dead)
-        # ratio of susceptible to total
-        obs[0] = float(output.n_susceptible) / n_total
-        # ratio of infected to total
-        obs[1] = float(output.n_infected) / n_total
-        # ratio of dead to total
-        obs[2] = float(output.n_dead) / n_total
-        # ratio of critical to hospital beds
-        obs[3] = float(output.n_critical) / output.hosp_capacity
-        # availability of vaccine
-        obs[4] = float(output.vaccine_available)
+        obs = observations(output, this.n_obs)
 
         # Reward: negative of cost function
         reward = -output.cost_function

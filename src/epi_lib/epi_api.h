@@ -81,6 +81,8 @@ typedef struct {
   uint64 n_recovered;
   uint64 n_vaccinated;
   uint64 n_dead;
+
+  float cost_function;
 } EpiObservable;
 
 // Create a single-population model from scenario description,

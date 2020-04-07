@@ -43,6 +43,7 @@ class EpiObservables:
     n_recovered = 0
     n_vaccinated = 0
     n_dead = 0
+    cost_function = 0
 
     def __init__(self, cepi_model.EpiObservable obs):
         self.day = obs.day
@@ -55,6 +56,7 @@ class EpiObservables:
         self.n_recovered = obs.n_recovered
         self.n_vaccinated = obs.n_vaccinated
         self.n_dead = obs.n_dead
+        self.cost_function = obs.cost_function
 
 cdef class EpiModel:
     cdef cepi_model.EpiModel _c_model

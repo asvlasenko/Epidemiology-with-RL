@@ -134,7 +134,9 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis) {
   float hosp_death_reduction = (1.f - hr) + hr * dis->hosp_death_reduction;
 
   // Update conditions and advance disease stages
-  // For now, assume that everyone who reaches max_duration recovers (TODO)
+  // For now, assume that everyone who reaches max_duration recovers
+  pop->n_dead_last = pop->n_dead;
+
   pop->n_recovered += pop->n_total_active[pop->max_duration - 1];
   pop->n_infected -= pop->n_total_active[pop->max_duration - 1];
   pop->n_total_critical -= pop->n_critical[pop->max_duration - 1];
@@ -212,26 +214,6 @@ epi_error_e add_hosp_capacity(pop_t *pop, uint64 n_beds) {
     return EPI_ERROR_INVALID_ARGS;
   }
   pop->n_hospital_beds += n_beds;
-  return EPI_ERROR_SUCCESS;
-}
-
-// Temporary debug function, print to command line for testing
-epi_error_e print_pop_info(size_t t, const pop_t *pop) {
-  if (pop == NULL) {
-    return EPI_ERROR_INVALID_ARGS;
-  }
-
-  printf("%I64u %I64u %I64u %I64u %I64u %I64u %f %f\n",
-    t,
-    pop->n_total,
-    pop->n_susceptible,
-    pop->n_infected,
-    pop->n_recovered,
-    pop->n_dead,
-    hospital_load(pop),
-    productivity_loss(pop)/1e9
-  );
-
   return EPI_ERROR_SUCCESS;
 }
 

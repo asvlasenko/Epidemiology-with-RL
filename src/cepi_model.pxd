@@ -70,6 +70,8 @@ cdef extern from "./epi_lib/epi_api.h":
         uint64 n_vaccinated
         uint64 n_dead
 
+        float cost_function
+
     # Create a single-population model from scenario description,
     # a disease data file and a population data file
     EpiError epi_construct_model(EpiModel *out, EpiScenario *sc)

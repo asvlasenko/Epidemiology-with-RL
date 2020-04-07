@@ -151,5 +151,10 @@ EpiError epi_get_observables(EpiObservable *out, const EpiModel model) {
   out->n_vaccinated = model->population->n_vaccinated;
   out->n_dead = model->population->n_dead;
 
+  //TODO: 8e6f is the estimated cost of one death, in dollars.  
+  //Replace this magic number with scenario parameter.
+  out->cost_function = productivity_loss(model->population) +
+    8e6f * (model->population->n_dead - model->population->n_dead_last);
+
   return EPI_ERROR_SUCCESS;
 }

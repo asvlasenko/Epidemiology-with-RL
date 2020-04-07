@@ -38,6 +38,7 @@ typedef struct {
   uint64 n_total_critical;
   uint64 n_recovered;
   uint64 n_vaccinated;
+  uint64 n_dead_last;
   uint64 n_dead;
 
   // Active disease phases are binned by day post infection

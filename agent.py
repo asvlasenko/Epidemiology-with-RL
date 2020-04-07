@@ -83,7 +83,6 @@ class Agent:
         x = np.random.random()
 
         # Chance to explore by taking a random action
-        action = np.zeros(n_actions, dtype = np.int8)
         if x < self.p_random:
             action = np.random.randint(0, self.n_actions)
         else:
@@ -104,3 +103,17 @@ class Agent:
         target = eval.copy()
 
         batch_index = np.arange(self.batch_size, dtype = np.int32)
+
+        target[batch_index, action] = \
+            reward + self.discount * np.max(next, axis=1) * running
+        _ = self.q_eval.fit(state, target, verbose=False)
+
+        if self.p_random > self.p_random_min:
+            self.p_random = \
+                max(self.p_random * self.p_random_dec, self.p_random_min)
+
+        def save(self):
+            self.brain.save(self.fname)
+
+        def load(self):
+            self.brain.load(self.fname)

@@ -41,6 +41,9 @@ typedef struct {
   uint64 n_dead_last;
   uint64 n_dead;
 
+  // Fraction of population that can be vaccinated each day
+  float daily_vaccination_capacity;
+
   // Active disease phases are binned by day post infection
   size_t max_duration;
 
@@ -74,7 +77,7 @@ epi_error_e infect_pop(pop_t *pop, uint64 n_cases);
 // Evolve the population forward by one day
 // TODO: add an argument that encodes government policies to control
 // the disease
-epi_error_e evolve_pop(pop_t *pop, const disease_t *dis);
+epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine);
 
 // Control measure: add hospital beds to population
 epi_error_e add_hosp_capacity(pop_t *pop, uint64 n_beds);

@@ -79,6 +79,9 @@ static epi_error_e read_pop_params(pop_t *pop, FILE *fp) {
   PASS_ERROR(read_float_token(&(pop->prod_dist), fp, "PROD_DIST"));
   PASS_ERROR(read_float_token(&(pop->prod_home), fp, "PROD_HOME"));
 
+  PASS_ERROR(read_float_token(&(pop->daily_vaccination_capacity), fp,
+    "DAILY_VACCINATION_CAPACITY"));
+
   return EPI_ERROR_SUCCESS;
 }
 
@@ -120,13 +123,18 @@ epi_error_e infect_pop(pop_t *pop, uint64 n_cases) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e evolve_pop(pop_t *pop, const disease_t *dis) {
+epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine); {
   if (pop == NULL || pop->n_total_active == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
 
   if (dis == NULL || dis->p_transmit == NULL) {
     return EPI_ERROR_INVALID_ARGS;
+  }
+
+  // Vaccination program
+  if (vaccine) {
+
   }
 
   // Death rate modifier based on availability of hospital beds

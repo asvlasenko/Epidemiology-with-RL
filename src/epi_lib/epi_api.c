@@ -120,8 +120,8 @@ EpiError epi_model_step(EpiModel model, const EpiInput *input) {
     return EPI_ERROR_SUCCESS;
   }
 
-  // Step population forward one day
-  PASS_ERROR(evolve_pop(model->population, model->disease));
+  PASS_ERROR(evolve_pop(model->population, model->disease,
+    model->vaccine_available));
   model->day++;
 
   return EPI_ERROR_SUCCESS;
@@ -151,7 +151,7 @@ EpiError epi_get_observables(EpiObservable *out, const EpiModel model) {
   out->n_vaccinated = model->population->n_vaccinated;
   out->n_dead = model->population->n_dead;
 
-  //TODO: 8e6f is the estimated cost of one death, in dollars.  
+  //TODO: 8e6f is the estimated cost of one death, in dollars.
   //Replace this magic number with scenario parameter.
   out->cost_function = productivity_loss(model->population) +
     8e6f * (model->population->n_dead - model->population->n_dead_last);

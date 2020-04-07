@@ -9,6 +9,11 @@ Optional, if not given default to n_susceptible = n_total
 $N_SUSCEPTIBLE
 300000000
 
+Fraction of population that can be vaccinated each day after vaccine
+is available
+$DAILY_VACCINATION_CAPACITY
+0.03
+
 *** TRANSMISSION MODEL ***
 
 Contact rates for various situations

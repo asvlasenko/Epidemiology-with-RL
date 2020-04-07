@@ -74,7 +74,7 @@ class Agent:
         self.batch_size = batch_size
         self.fname = fname
 
-        self.brain = build_net(n_actions, n_input, 128, 128, learning_rate)
+        self.brain = build_net(n_actions, n_input, 16, 16, learning_rate)
         self.memory = Memory(mem_size, n_actions, n_input)
 
     # Choose a set of actions

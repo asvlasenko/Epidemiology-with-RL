@@ -15,6 +15,21 @@ def build_net(n_output, n_input, n1, n2, learning_rate):
     network.compile(optimizer = Adam(lr = learning_rate), loss = 'mse')
     return network
 
+# Memory record for reinforcement learning
+class Memory:
+    def __init__(self, size, n_actions, n_input):
+        self.size = size
+        self.n_actions = n_actions
+        self.n_input = n_input
+
+        self.counter = 0
+
+        self.state = np.zeros((self.size, n_input), dtype = np.float32)
+        self.next_state = np.zeros((self.size, n_input), dtype = np.float32)
+        self.action = np.zeros((self.size, n_actions), dtype = np.int8)
+        self.reward = np.zeros(self.size, dtype = np.float32)
+        self.running = np.zeros(self.size, dtype = np.float32)
+
 # Agent class, consisting of a neural network plus memory record
 class Agent:
     def __init__(self, n_actions, n_input, learning_rate, discount,
@@ -33,5 +48,6 @@ class Agent:
         self.fname = fname
 
         self.brain = build_net(n_actions, n_input, 128, 128, learning_rate)
+        self.memory = Memory(mem_size, n_actions, n_input)
 
         #TODO: self.memory

@@ -37,13 +37,14 @@ class EpiObservables:
     finished = False
     vaccine_available = False
     hosp_capacity = 0
+    n_total = 0
     n_susceptible = 0
     n_infected = 0
     n_critical = 0
     n_recovered = 0
     n_vaccinated = 0
     n_dead = 0
-    cost_function = 0
+    cost_function = 0.0f
 
     def __init__(self, cepi_model.EpiObservable obs):
         self.day = obs.day

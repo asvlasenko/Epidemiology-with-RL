@@ -3,3 +3,4 @@ bin/
 *.pyd
 src/epi_model.c
 build/
+*.pyc

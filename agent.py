@@ -91,12 +91,17 @@ class Agent:
 
         return action
 
+    def record(self, state, next_state, action, reward, done):
+        self.memory.store(state, next_state, action, reward, done)
+
     def learn(self):
         if self.memory.counter < self.batch_size:
             return
 
         state, next_state, action, reward, running = \
             self.memory.batch(self.batch_size)
+        act_space = np.array([i for i in range(self.n_actions)])
+        act_indices = np.dot(action, act_space)
 
         eval = self.brain.predict(state)
         next = self.brain.predict(next_state)
@@ -104,16 +109,16 @@ class Agent:
 
         batch_index = np.arange(self.batch_size, dtype = np.int32)
 
-        target[batch_index, action] = \
+        target[batch_index, act_indices] = \
             reward + self.discount * np.max(next, axis=1) * running
-        _ = self.q_eval.fit(state, target, verbose=False)
+        _ = self.brain.fit(state, target, verbose=False)
 
         if self.p_random > self.p_random_min:
             self.p_random = \
                 max(self.p_random * self.p_random_dec, self.p_random_min)
 
-        def save(self):
-            self.brain.save(self.fname)
+    def save(self):
+        self.brain.save(self.fname)
 
-        def load(self):
-            self.brain.load(self.fname)
+    def load(self):
+        self.brain.load(self.fname)

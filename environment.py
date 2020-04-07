@@ -88,7 +88,7 @@ class env:
 
         # Get observations and other info
         output = self.world.get_observables()
-        obs = observations(output, this.n_obs)
+        obs = observations(output, self.n_obs)
 
         # Reward: negative of cost function
         reward = -output.cost_function

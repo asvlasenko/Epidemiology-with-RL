@@ -11,3 +11,12 @@ scores = []
 for i in range(n_runs):
     done = False
     score = 0.0
+    obs = world.reset()
+
+    #while not done:
+    action = player.act(obs)
+    next, reward, done, info = world.step(action)
+    score += reward
+    player.record(obs, next, action, reward, done)
+    obs = next
+    player.learn()

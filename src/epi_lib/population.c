@@ -123,7 +123,7 @@ epi_error_e infect_pop(pop_t *pop, uint64 n_cases) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine); {
+epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine) {
   if (pop == NULL || pop->n_total_active == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -132,9 +132,13 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine); {
     return EPI_ERROR_INVALID_ARGS;
   }
 
-  // Vaccination program
   if (vaccine) {
-
+    size_t dv = (size_t)(pop->daily_vaccination_capacity * pop->n_susceptible);
+    if (dv > pop->n_susceptible) {
+      dv = pop->n_susceptible;
+    }
+    pop->n_susceptible -= dv;
+    pop->n_vaccinated += dv;
   }
 
   // Death rate modifier based on availability of hospital beds
@@ -189,10 +193,6 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine); {
       pop->n_total_critical += w_s - w_c - r_c;
       pop->n_recovered += r_a + r_s + r_c;
       pop->n_infected -= r_a + r_s + r_c + w_c;
-
-      // DEBUG: check conservation by time bin
-      assert(pop->n_total_active[i] ==
-        pop->n_asymptomatic[i] + pop->n_symptomatic[i] + pop->n_critical[i]);
     }
   } // If pop(n_infected > 0)
 
@@ -209,10 +209,6 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine); {
                         infection_rate / (float)pop->n_susceptible,
                         pop->n_susceptible));
   PASS_ERROR(infect_pop(pop, n_infected));
-
-  // DEBUG: Check conservation by entire population
-  assert(pop->n_total == pop->n_susceptible + pop->n_infected
-    + pop->n_recovered + pop->n_dead + pop->n_vaccinated);
 
   return EPI_ERROR_SUCCESS;
 }
@@ -279,7 +275,6 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
   float fs = wa * pop->n_susceptible / cr;
 
   float inf_rate = 0.f;
-  assert(pop->max_duration == dis->max_duration);
   for (size_t i = 0; i < pop->max_duration; i++) {
     // Number of contacts by people on day i of disease
     float ci = wa * dis->asymp_trans_reduction * pop->n_asymptomatic[i]

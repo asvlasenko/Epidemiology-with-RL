@@ -44,7 +44,7 @@ class EpiObservables:
     n_recovered = 0
     n_vaccinated = 0
     n_dead = 0
-    cost_function = 0.0f
+    cost_function = 0.0
 
     def __init__(self, cepi_model.EpiObservable obs):
         self.day = obs.day
@@ -77,9 +77,7 @@ cdef class EpiModel:
         HandleError(err)
 
     def __dealloc__(self):
-        cdef cepi_model.EpiError err
-        err = cepi_model.epi_free_model(&self._c_model)
-        HandleError(err)
+        cepi_model.epi_free_model(&self._c_model)
 
     def step(self, input):
         cdef cepi_model.EpiInput inp

@@ -7,13 +7,19 @@ from keras.optimizers import Adam
 
 # Construct neural network with two hidden layers
 def build_net(n_output, n_input, n1, n2, learning_rate):
-    network = Sequential([Dense(n1, input_shape = (n_input, )),
-                          Activation('relu'),
-                          Dense(n2),
-                          Activation('relu'),
-                          Dense(n_output)])
-    network.compile(optimizer = Adam(lr = learning_rate), loss = 'mse')
-    return network
+    print(n_output, n_input, n1, n2, learning_rate)
+    #model = Sequential([Dense(n1, input_shape=(n_input, )),
+    #                    Activation('relu'),
+    #                    Dense(n2),
+    #                    Activation('relu'),
+    #                    Dense(n_output)])
+    model = Sequential([Dense(256, input_shape=(4, )),
+                        Activation('relu'),
+                        Dense(256),
+                        Activation('relu'),
+                        Dense(8)])
+    #model.compile(optimizer=Adam(lr=learning_rate), loss = 'mse')
+    #return model
 
 # Memory record for reinforcement learning
 class Memory:
@@ -74,7 +80,8 @@ class Agent:
         self.batch_size = batch_size
         self.fname = fname
 
-        self.brain = build_net(n_actions, n_input, 128, 128, learning_rate)
+        #self.brain =
+        build_net(n_actions, n_input, 128, 128, learning_rate)
         self.memory = Memory(mem_size, n_actions, n_input)
 
     # Choose a set of actions

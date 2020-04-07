@@ -21,32 +21,34 @@ class env:
     # start_day is the earliest and latest possible outbreak times.
     # t_vaccine is the shortest and longest time possible between outbreak and
     # vaccine availability.
-    def __init__(this, p_no_outbreak = 0.5, start_day = (0,300),
+    def __init__(self, p_no_outbreak = 0.5, start_day = (0,300),
             t_vaccine = (400,700)):
 
-        this.p_no_outbreak = p_no_outbreak
-        this.start_day = start_day
-        this.t_vaccine = t_vaccine
+        self.p_no_outbreak = p_no_outbreak
+        self.start_day = start_day
+        self.t_vaccine = t_vaccine
 
-        this.running = false
-
-        this.reset()
+        self.reset()
 
     # Reset the world
-    def reset():
+    def reset(self):
+        #sc = em.EpiScenario()
+        #self.world = em.EpiModel(sc)
+
         sc = em.EpiScenario()
         # Control case: no outbreak occurs
         x = np.random.random()
-        if x < p_no_outbreak:
+        if x < self.p_no_outbreak:
             sc.t_initial = -1
             sc.t_max = 1000
         # Random disease start date
         x = np.random.random()
-        sc.t_initial = (1.0-x)*start_day[0] + x*start_day[1]
+        sc.t_initial = (1.0-x)*self.start_day[0] + x*self.start_day[1]
         # Random time to vaccination
         x = np.random.random()
-        sc.t_vaccine = sc.t_initial + (1.0-x)*t_vaccine[0] + x*t_vaccine[1]
-        this.world = em.EpiModel(sc)
+        sc.t_vaccine = sc.t_initial + \
+            (1.0-x)*self.t_vaccine[0] + x*self.t_vaccine[1]
+        self.world = em.EpiModel(sc)
 
     # Step the world forward based on action, generating output
     # Action is a set of flags, one for each possible control measure
@@ -54,7 +56,7 @@ class env:
     # For now, info is the same as observation, however when the testing
     # model is implemented, info will describe the true situation, while
     # observation will describe what is visible to the agent.
-    def step(action):
+    def step(self, action):
         assert(action < self.n_actions)
         # Translate action into EpiInput
         input = em.EpiInput()
@@ -63,10 +65,10 @@ class env:
         input.dist_home_all = bool(action & int('0100', 2))
 
         # Take a one-day step
-        this.world.step(input)
+        self.world.step(input)
 
         # Get observations and other info
-        output = this.world.get_observables()
+        output = self.world.get_observables()
 
         # Observations
         obs = np.zeros(this.n_obs, dtype = np.float32)

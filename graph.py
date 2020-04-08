@@ -26,8 +26,8 @@ while not output.finished:
     n_vaccinated.append(output.n_vaccinated)
 
 fig, (p1, p2) = plt.subplots(1, 2)
-fig.set_figheight(8)
-fig.set_figwidth(16)
+fig.set_figheight(4)
+fig.set_figwidth(8)
 
 p1.set_xlabel("time, days")
 p1.set_ylabel("number of people")

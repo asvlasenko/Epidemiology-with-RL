@@ -60,36 +60,36 @@ typedef struct {
   // uint64 n_negative_tests;
   // uint64 n_known_recovered;
 
-} pop_t;
+} Population;
 
 // Create population from data file
-epi_error_e create_pop_from_file(pop_t **out, const char *fname,
+EpiError create_pop_from_file(Population **out, const char *fname,
   size_t disease_duration);
 
 // Frees population struct and associated data.  Nulls population pointer.
-epi_error_e free_pop(pop_t **pop);
+EpiError free_pop(Population **pop);
 
 // Infect members of the population.  If requested number of infected exceeds
 // the total susceptible population, then the entire susceptible population
 // becomes infected.
-epi_error_e infect_pop(pop_t *pop, uint64 n_cases);
+EpiError infect_pop(Population *pop, uint64 n_cases);
 
 // Evolve the population forward by one day
 // TODO: add an argument that encodes government policies to control
 // the disease
-epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine);
+EpiError evolve_pop(Population *pop, const Disease *dis, bool vaccine);
 
 // Control measure: add hospital beds to population
-epi_error_e add_hosp_capacity(pop_t *pop, uint64 n_beds);
+EpiError add_hosp_capacity(Population *pop, uint64 n_beds);
 
 // Print info, for debug purposes
-epi_error_e print_pop_info(size_t t, const pop_t *pop);
+EpiError print_pop_info(size_t t, const Population *pop);
 
 // Calculate ratio of critical cases to hospital capacity
-float hospital_load(const pop_t *pop);
+float hospital_load(const Population *pop);
 
 // TODO: move to different file
 // Calculate productivity impact per day
-float productivity_loss(const pop_t *pop);
+float productivity_loss(const Population *pop);
 
 #endif

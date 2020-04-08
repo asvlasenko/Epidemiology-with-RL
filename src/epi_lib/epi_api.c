@@ -11,8 +11,8 @@ struct _EpiModel {
   bool vaccine_available;
 
   EpiScenario scenario;
-  disease_t *disease;
-  pop_t *population;
+  Disease *disease;
+  Population *population;
 };
 
 EpiError epi_construct_model(EpiModel *out, const EpiScenario *scenario) {

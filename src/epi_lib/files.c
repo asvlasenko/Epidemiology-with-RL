@@ -1,6 +1,6 @@
 #include "files.h"
 
-epi_error_e read_size_token(size_t *s, FILE *fp, const char *token_name) {
+EpiError read_size_token(size_t *s, FILE *fp, const char *token_name) {
   if (s == NULL || fp == NULL || token_name == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -22,7 +22,7 @@ epi_error_e read_size_token(size_t *s, FILE *fp, const char *token_name) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e read_float_token(float *f, FILE *fp, const char *token_name) {
+EpiError read_float_token(float *f, FILE *fp, const char *token_name) {
   if (f == NULL || fp == NULL || token_name == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -43,7 +43,7 @@ epi_error_e read_float_token(float *f, FILE *fp, const char *token_name) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e read_float_array(float *f, size_t size, FILE *fp,
+EpiError read_float_array(float *f, size_t size, FILE *fp,
   const char *token_name) {
   if (f == NULL || size == 0 || fp == NULL || token_name == NULL) {
     return EPI_ERROR_INVALID_ARGS;
@@ -68,7 +68,7 @@ epi_error_e read_float_array(float *f, size_t size, FILE *fp,
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e find_token_in_file(FILE *fp, const char *token_name) {
+EpiError find_token_in_file(FILE *fp, const char *token_name) {
   if (fp == NULL || token_name == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }

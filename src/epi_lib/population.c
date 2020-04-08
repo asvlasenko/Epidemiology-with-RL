@@ -3,15 +3,15 @@
 #include "population.h"
 
 // Calculate average infection rate
-static float calc_inf_rate(const pop_t *pop, const disease_t *dis);
+static float calc_inf_rate(const Population *pop, const Disease *dis);
 
 // Calculate fraction of critical cases that can be hospitalized
-static float calc_hosp_rate(const pop_t *pop);
+static float calc_hosp_rate(const Population *pop);
 
 // Read population parameters
-static epi_error_e read_pop_params(pop_t *pop, FILE *fp);
+static EpiError read_pop_params(Population *pop, FILE *fp);
 
-epi_error_e create_pop_from_file(pop_t **out, const char *fname,
+EpiError create_pop_from_file(Population **out, const char *fname,
   size_t disease_duration) {
 
   if (out == NULL || fname == NULL) {
@@ -23,13 +23,13 @@ epi_error_e create_pop_from_file(pop_t **out, const char *fname,
     return EPI_ERROR_FILE_NOT_FOUND;
   }
 
-  pop_t *pop = (pop_t *)calloc(1, sizeof(pop_t));
+  Population *pop = (Population *)calloc(1, sizeof(Population));
   if (pop == NULL) {
     fclose(fp);
     return EPI_ERROR_OUT_OF_MEMORY;
   }
 
-  epi_error_e err = read_pop_params(pop, fp);
+  EpiError err = read_pop_params(pop, fp);
   if (err != EPI_ERROR_SUCCESS) {
     fclose(fp);
     free(pop);
@@ -48,21 +48,16 @@ epi_error_e create_pop_from_file(pop_t **out, const char *fname,
   pop->n_symptomatic = &ptr[2*disease_duration];
   pop->n_critical = &ptr[3*disease_duration];
 
-  // Some paranoia to catch bugs due to incomplete changes
-  // to population data type
-  uint64 *ptr_last = &pop->n_critical[disease_duration-1];
-  assert(ptr_last - ptr == N_POP_ARRAY_FIELDS * disease_duration - 1);
-
   *out = pop;
   return EPI_ERROR_SUCCESS;
 }
 
-static epi_error_e read_pop_params(pop_t *pop, FILE *fp) {
+static EpiError read_pop_params(Population *pop, FILE *fp) {
   PASS_ERROR(read_size_token(&(pop->n_total), fp, "N_TOTAL"));
 
   // Susceptible population token is optional.
   // If not found, set n_susceptible = n_total.
-  epi_error_e err = read_size_token(&(pop->n_susceptible), fp, "N_SUSCEPTIBLE");
+  EpiError err = read_size_token(&(pop->n_susceptible), fp, "N_SUSCEPTIBLE");
   if (err == EPI_ERROR_MISSING_DATA) {
     pop->n_susceptible = pop->n_total;
   } else if (err != EPI_ERROR_SUCCESS) {
@@ -86,7 +81,7 @@ static epi_error_e read_pop_params(pop_t *pop, FILE *fp) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e free_pop(pop_t **pop) {
+EpiError free_pop(Population **pop) {
   if (pop == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -108,7 +103,7 @@ epi_error_e free_pop(pop_t **pop) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e infect_pop(pop_t *pop, uint64 n_cases) {
+EpiError infect_pop(Population *pop, uint64 n_cases) {
   if (pop == NULL || pop->n_total_active == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -124,7 +119,7 @@ epi_error_e infect_pop(pop_t *pop, uint64 n_cases) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine) {
+EpiError evolve_pop(Population *pop, const Disease *dis, bool vaccine) {
   if (pop == NULL || pop->n_total_active == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -214,7 +209,7 @@ epi_error_e evolve_pop(pop_t *pop, const disease_t *dis, bool vaccine) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e add_hosp_capacity(pop_t *pop, uint64 n_beds) {
+EpiError add_hosp_capacity(Population *pop, uint64 n_beds) {
   if (pop == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -222,7 +217,7 @@ epi_error_e add_hosp_capacity(pop_t *pop, uint64 n_beds) {
   return EPI_ERROR_SUCCESS;
 }
 
-static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
+static float calc_inf_rate(const Population *pop, const Disease *dis) {
 
   // Weights for how often asymptomatic, symptomatic and critical people come
   // into contact with each other.  These are affected by the population's
@@ -288,7 +283,7 @@ static float calc_inf_rate(const pop_t *pop, const disease_t *dis) {
   return inf_rate;
 }
 
-static float calc_hosp_rate(const pop_t *pop) {
+static float calc_hosp_rate(const Population *pop) {
   if (!pop->n_hospital_beds) {
     return 0.f;
   }
@@ -304,7 +299,7 @@ static float calc_hosp_rate(const pop_t *pop) {
   return 1.f / load;
 }
 
-float hospital_load(const pop_t *pop) {
+float hospital_load(const Population *pop) {
   uint64 n_crit = 0;
   for (size_t i = 0; i < pop->max_duration; i++) {
     n_crit += pop->n_critical[i];
@@ -313,7 +308,7 @@ float hospital_load(const pop_t *pop) {
   return (float)n_crit / (float)pop->n_hospital_beds;
 }
 
-float productivity_loss(const pop_t *pop) {
+float productivity_loss(const Population *pop) {
   // People who are dead or in critical condition lose all production
   uint64 n_incap = pop->n_dead;
   for (size_t i = 0; i < pop->max_duration; i++) {

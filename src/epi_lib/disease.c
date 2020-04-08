@@ -1,11 +1,11 @@
 #include "disease.h"
 #include "files.h"
 
-static epi_error_e read_disease_params(disease_t *dis, FILE *fp);
-static epi_error_e allocate_disease_arrays(disease_t *dis);
-static epi_error_e read_disease_arrays(disease_t *dis, FILE *fp);
+static EpiError read_disease_params(Disease *dis, FILE *fp);
+static EpiError allocate_disease_arrays(Disease *dis);
+static EpiError read_disease_arrays(Disease *dis, FILE *fp);
 
-epi_error_e create_disease_from_file(disease_t **out, const char *filename) {
+EpiError create_disease_from_file(Disease **out, const char *filename) {
   if (out == NULL || filename == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -15,13 +15,13 @@ epi_error_e create_disease_from_file(disease_t **out, const char *filename) {
     return EPI_ERROR_FILE_NOT_FOUND;
   }
 
-  disease_t *dis = (disease_t *)calloc(1, sizeof(disease_t));
+  Disease *dis = (Disease *)calloc(1, sizeof(Disease));
   if (dis == NULL) {
     fclose(fp);
     return EPI_ERROR_OUT_OF_MEMORY;
   }
 
-  epi_error_e err = read_disease_params(dis, fp);
+  EpiError err = read_disease_params(dis, fp);
   if (err != EPI_ERROR_SUCCESS) {
     fclose(fp);
     free(dis);
@@ -48,7 +48,7 @@ epi_error_e create_disease_from_file(disease_t **out, const char *filename) {
   return EPI_ERROR_SUCCESS;
 }
 
-epi_error_e free_disease(disease_t **dis) {
+EpiError free_disease(Disease **dis) {
   if (dis == NULL) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -72,7 +72,7 @@ epi_error_e free_disease(disease_t **dis) {
   return EPI_ERROR_SUCCESS;
 }
 
-static epi_error_e read_disease_params(disease_t *dis, FILE *fp) {
+static EpiError read_disease_params(Disease *dis, FILE *fp) {
   PASS_ERROR(read_size_token(&(dis->max_duration), fp, "MAX_DURATION"));
   PASS_ERROR(read_float_token(&(dis->asymp_trans_reduction), fp,
     "ASYMP_TRANS_REDUCTION"));
@@ -83,7 +83,7 @@ static epi_error_e read_disease_params(disease_t *dis, FILE *fp) {
   return EPI_ERROR_SUCCESS;
 }
 
-static epi_error_e allocate_disease_arrays(disease_t *dis) {
+static EpiError allocate_disease_arrays(Disease *dis) {
   if (dis == NULL || !dis->max_duration) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -102,14 +102,10 @@ static epi_error_e allocate_disease_arrays(disease_t *dis) {
   dis->p_critical = &ptr[4*n];
   dis->p_death = &ptr[5*n];
 
-  // Some paranoia to catch incomplete changes to disease data type
-  float *ptr_last = &dis->p_death[n-1];
-  assert(ptr_last - ptr == N_DISEASE_ARRAY_FIELDS * n - 1);
-
   return EPI_ERROR_SUCCESS;
 }
 
-static epi_error_e read_disease_arrays(disease_t *dis, FILE *fp) {
+static EpiError read_disease_arrays(Disease *dis, FILE *fp) {
   PASS_ERROR(read_float_array(dis->p_transmit,
     dis->max_duration, fp, "P_TRANSMIT"));
   PASS_ERROR(read_float_array(dis->p_symptoms,

@@ -31,7 +31,6 @@ class Memory:
         self.running = np.zeros(self.size, dtype = np.float32)
 
     # Store an event
-    # Action is a Boolean array, describing which possible actions are active
     def store(self, state, next_state, action, reward, done):
         i = self.counter % self.size    # Circular buffer
         self.state[i] = state
@@ -77,12 +76,12 @@ class Agent:
         self.brain = build_net(n_actions, n_input, 256, 256, learning_rate)
         self.memory = Memory(mem_size, n_actions, n_input)
 
-    # Choose a set of actions
+    # Choose an action
     def act(self, state):
         state = state[np.newaxis, :]
-        x = np.random.random()
 
         # Chance to explore by taking a random action
+        x = np.random.random()
         if x < self.p_random:
             action = np.random.randint(0, self.n_actions)
         else:

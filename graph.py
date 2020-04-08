@@ -61,7 +61,6 @@ while not done:
     action = player.act(obs)
     next, reward, done, output = world.step(action)
     score += reward
-    player.record(obs, next, action, reward, done)
     obs = next
 
     day.append(output.day)

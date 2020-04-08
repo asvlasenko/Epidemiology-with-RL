@@ -6,7 +6,7 @@ import agent
 
 world = env()
 player = agent.Agent(8, 5, 0.0005, 0.99)
-player.load()
+# player.load()
 
 n_runs = 500
 losses = []

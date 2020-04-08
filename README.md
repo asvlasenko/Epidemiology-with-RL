@@ -19,3 +19,7 @@ To test the performance of the model after training, use
 Finally, to plot the outcome of the model, without mitigation and with
 mitigation strategies determined by the AI, use
   python graph.py
+
+Here is a typical output of graph.py, showing the effect of mitigation
+strategies on the disease outbreak:
+!(https://github.com/asvlasenko/Epidemiology-with-RL/blob/master/mitigation.png)

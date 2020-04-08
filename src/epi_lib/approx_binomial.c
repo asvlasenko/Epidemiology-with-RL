@@ -1,13 +1,13 @@
 #include "approx_binomial.h"
 
 // Draw a number of events from a Poisson distribution
-static epi_error_e poisson_draw(uint64 *k, float rate);
+static EpiError poisson_draw(uint64 *k, float rate);
 
 // Generate a normally distributed floating point number
 // with mean = 0 and variance = 1
 static float rand_normal();
 
-epi_error_e approx_dbin_draw(uint64 *nx, uint64 *ny,
+EpiError approx_dbin_draw(uint64 *nx, uint64 *ny,
   float p_x, float p_y, uint64 n) {
 
   if (nx == NULL || ny == NULL || p_x + p_y > 1.f || p_x < 0.f || p_y < 0.f) {
@@ -68,7 +68,7 @@ epi_error_e approx_dbin_draw(uint64 *nx, uint64 *ny,
 // distribution as a Gaussian distribution
 #define GAUSSIAN_CUTOFF 0.5
 
-epi_error_e approx_bin_draw(uint64 *k, float p, uint64 n) {
+EpiError approx_bin_draw(uint64 *k, float p, uint64 n) {
   if (k == NULL || p < 0.f || p > 1.f) {
     return EPI_ERROR_INVALID_ARGS;
   }
@@ -142,7 +142,7 @@ epi_error_e approx_bin_draw(uint64 *k, float p, uint64 n) {
 // Max steps in accept-reject method before we assume there is an error
 #define POISSON_MAX_STEPS 1024
 
-static epi_error_e poisson_draw(uint64 *k, float rate) {
+static EpiError poisson_draw(uint64 *k, float rate) {
   if (k == NULL || rate < 0.f) {
     return EPI_ERROR_INVALID_ARGS;
   }

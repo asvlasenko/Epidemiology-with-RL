@@ -12,11 +12,11 @@
 // ny = number of outcomes y}, with an approximately correct probability.
 // In the disease model, this is used to determine how many patients from a
 // population recover, have their condition worsen, or neither.
-epi_error_e approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n);
+EpiError approx_dbin_draw(uint64 *nx, uint64 *ny, float p_x, float p_y, uint64 n);
 
 // Approximate draw from a binomial distribution.
 // Determine the number of outcomes k, having probability per experiment p,
 // from n experiments.
-epi_error_e approx_bin_draw(uint64 *k, float p, uint64 n);
+EpiError approx_bin_draw(uint64 *k, float p, uint64 n);
 
 #endif

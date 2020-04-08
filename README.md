@@ -22,4 +22,4 @@ mitigation strategies determined by the AI, use
 
 Here is a typical output of graph.py, showing the effect of mitigation
 strategies on the disease outbreak:
-!(https://github.com/asvlasenko/Epidemiology-with-RL/blob/master/mitigation.png)
+https://github.com/asvlasenko/Epidemiology-with-RL/blob/master/mitigation.png

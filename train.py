@@ -6,6 +6,7 @@ import agent
 
 world = env()
 player = agent.Agent(8, 5, 0.0005, 0.99)
+player.load()
 
 n_runs = 500
 losses = []
@@ -18,7 +19,7 @@ for i in range(n_runs):
     while not done:
         action = player.act(obs)
         next, reward, done, info = world.step(action)
-        score += reward
+        loss += reward
         player.record(obs, next, action, reward, done)
         obs = next
         player.learn()
